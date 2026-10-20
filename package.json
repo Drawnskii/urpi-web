@@ -1,0 +1,36 @@
+{
+  "name": "urpi-web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsr generate && tsc -b && vite build",
+    "typecheck": "tsr generate && tsc -b",
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "preview": "vite preview",
+    "routes": "tsr generate"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.104.4",
+    "@tanstack/react-router": "^1.170.45",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@tanstack/eslint-plugin-query": "^5.104.4",
+    "@tanstack/react-query-devtools": "^5.104.4",
+    "@tanstack/react-router-devtools": "^1.167.2",
+    "@tanstack/router-cli": "^1.167.45",
+    "@tanstack/router-plugin": "^1.168.47",
+    "@types/node": "^24.13.3",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.7",
+    "@vitejs/plugin-react": "^6.1.1",
+    "oxlint": "^1.81.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.0"
+  }
+}

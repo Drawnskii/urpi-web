@@ -1,0 +1,163 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "react",
+    "typescript",
+    "oxc",
+    "import",
+    "jsx-a11y"
+  ],
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "ignorePatterns": [
+    "dist",
+    "node_modules",
+    "src/app/route-tree.gen.ts"
+  ],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "warn",
+    "react/only-export-components": [
+      "warn",
+      {
+        "allowConstantExport": true
+      }
+    ],
+    "react/react-in-jsx-scope": "off",
+    "import/no-cycle": "error",
+    "typescript/consistent-type-imports": "error",
+    "import/no-unassigned-import": [
+      "warn",
+      {
+        "allow": [
+          "**/*.css"
+        ]
+      }
+    ],
+    "@tanstack/query/exhaustive-deps": "error",
+    "@tanstack/query/no-rest-destructuring": "warn",
+    "@tanstack/query/stable-query-client": "error",
+    "@tanstack/query/no-unstable-deps": "error",
+    "@tanstack/query/infinite-query-property-order": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "src/shared/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/app",
+                  "@/app/*",
+                  "@/pages",
+                  "@/pages/*",
+                  "@/features",
+                  "@/features/*"
+                ],
+                "message": "shared/ is the bottom layer: it must not import from app/, pages/ or features/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/features/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/app",
+                  "@/app/*",
+                  "@/pages",
+                  "@/pages/*"
+                ],
+                "message": "features/ must not import from app/ or pages/ (dependencies only flow downward)."
+              },
+              {
+                "group": [
+                  "@/features/*/**"
+                ],
+                "message": "Import other features through their public API (@/features/<name>), never their internals. Inside a feature, use relative imports."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/pages/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/app",
+                  "@/app/*"
+                ],
+                "message": "pages/ must not import from app/."
+              },
+              {
+                "group": [
+                  "@/features/*/**"
+                ],
+                "message": "Import features through their public API (@/features/<name>)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/app/**"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": [
+                  "@/features/*/**"
+                ],
+                "message": "Import features through their public API (@/features/<name>)."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "src/app/routes/**"
+      ],
+      "rules": {
+        "react/only-export-components": "off"
+      }
+    }
+  ],
+  "jsPlugins": [
+    "@tanstack/eslint-plugin-query"
+  ]
+}
