@@ -2,7 +2,7 @@
 
 Web dashboard for Urpi. React + TypeScript client for the urpi-api backend.
 
-Built on the Vite `react-ts` template, with a feature-driven folder structure, TanStack Router (file-based), TanStack Query and Zustand.
+Built on the Vite `react-ts` template, with a feature-driven folder structure, TanStack Router (file-based), TanStack Query, Zustand and Tailwind CSS 4.
 
 ## Getting started
 
@@ -31,7 +31,7 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running for pag
 src/
   app/                 bootstrap and wiring, knows about everything
     routes/            TanStack Router file routes (thin: loader + page component)
-    styles/            global CSS
+    styles/            global CSS (imports Tailwind)
     app.tsx            Providers + RouterProvider
     router.ts          router instance, type registration
     query-client.ts    QueryClient defaults
