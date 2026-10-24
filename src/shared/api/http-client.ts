@@ -3,13 +3,17 @@ import { env } from '@/shared/config'
 import { ApiError } from './api-error'
 
 type HeadersProvider = () => Record<string, string>
+type StreamParamsProvider = () => QueryParams
 
 let getDefaultHeaders: HeadersProvider = () => ({})
+let getStreamParams: StreamParamsProvider = () => ({})
 
 // Called once by the app layer (src/app/http.ts) to add headers every request needs,
-// such as X-Tenant-ID. shared/ never knows where those values come from.
-export function configureHttp(options: { getHeaders: HeadersProvider }) {
+// such as X-Tenant-ID, and the query params every stream needs (EventSource can't send headers).
+// shared/ never knows where those values come from.
+export function configureHttp(options: { getHeaders: HeadersProvider; getStreamParams?: StreamParamsProvider }) {
   getDefaultHeaders = options.getHeaders
+  getStreamParams = options.getStreamParams ?? (() => ({}))
 }
 
 type QueryParams = Record<string, string | number | boolean | null | undefined>
@@ -38,6 +42,11 @@ export async function http<T>(path: string, { body, params, headers, ...init }: 
   }
 
   return data as T
+}
+
+// The URL for an EventSource: the base URL plus the stream params from configureHttp
+export function streamUrl(path: string) {
+  return buildUrl(path, getStreamParams())
 }
 
 function buildUrl(path: string, params?: QueryParams) {
