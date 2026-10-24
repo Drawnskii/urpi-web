@@ -38,3 +38,39 @@ export function useAddMessage(chatId: string) {
     },
   })
 }
+
+// The newest client message each chat is marked read up to, so each one is marked once.
+// Both routes mark read. Module scope: it survives switching chats
+const markedReadUpTo = new Map<string, string>()
+
+export function isMarkedRead(chatId: string, clientMessageId: string) {
+  return markedReadUpTo.get(chatId) === clientMessageId
+}
+
+// The variable is the newest client message the call covers (the route itself takes only the chat)
+function useReadReceiptMutation(chatId: string, send: (chatId: string) => Promise<void>) {
+  return useMutation({
+    mutationFn: (_clientMessageId: string) => send(chatId),
+    // Claimed before the call, so a re-render can't send it twice; given back if the call fails
+    onMutate: (clientMessageId) => {
+      const previous = markedReadUpTo.get(chatId)
+      markedReadUpTo.set(chatId, clientMessageId)
+      return { previous }
+    },
+    onError: (_error, clientMessageId, onMutateResult) => {
+      if (markedReadUpTo.get(chatId) !== clientMessageId) return
+      if (onMutateResult?.previous) markedReadUpTo.set(chatId, onMutateResult.previous)
+      else markedReadUpTo.delete(chatId)
+    },
+  })
+}
+
+// WhatsApp's blue ticks. A 502 (the provider failed) is left alone: the next client message retries
+export function useMarkChatRead(chatId: string) {
+  return useReadReceiptMutation(chatId, chatApi.markRead)
+}
+
+// "typing…" for about 25 s, and the blue ticks
+export function useShowTyping(chatId: string) {
+  return useReadReceiptMutation(chatId, chatApi.showTyping)
+}

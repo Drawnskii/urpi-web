@@ -34,6 +34,11 @@ export class ApiError extends Error {
   get isUnprocessable() {
     return this.status === 422
   }
+
+  // An upstream service failed (for example Meta), not the request: retrying may work
+  get isBadGateway() {
+    return this.status === 502
+  }
 }
 
 // 422 issues keyed by field: loc ['body', 'adjective'] -> { adjective: 'Field required' }

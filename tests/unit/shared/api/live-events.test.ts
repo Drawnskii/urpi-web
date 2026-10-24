@@ -1,39 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { connectLiveEvents, useLiveEventsStore, type LiveEventsStatus } from './live-events'
+import { connectLiveEvents, useLiveEventsStore, type LiveEventsStatus } from '@/shared/api/live-events'
 
-// Just enough of EventSource: listeners by event name, readyState and onerror
-class FakeEventSource {
-  static CONNECTING = 0
-  static OPEN = 1
-  static CLOSED = 2
-  static last: FakeEventSource
-
-  readyState = FakeEventSource.CONNECTING
-  onerror: (() => void) | null = null
-  private listeners = new Map<string, ((event: { data: string }) => void)[]>()
-
-  constructor() {
-    FakeEventSource.last = this
-  }
-
-  addEventListener(name: string, listener: (event: { data: string }) => void) {
-    this.listeners.set(name, [...(this.listeners.get(name) ?? []), listener])
-  }
-
-  close() {
-    this.readyState = FakeEventSource.CLOSED
-  }
-
-  emit(name: string, data: unknown = {}) {
-    for (const listener of this.listeners.get(name) ?? []) listener({ data: JSON.stringify(data) })
-  }
-
-  fail(readyState: number) {
-    this.readyState = readyState
-    this.onerror?.()
-  }
-}
+import { FakeEventSource } from '@tests/fakes/event-source'
 
 describe('connectLiveEvents', () => {
   let statuses: LiveEventsStatus[]
