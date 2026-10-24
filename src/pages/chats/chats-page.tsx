@@ -1,7 +1,9 @@
-import { Outlet, useChildMatches } from '@tanstack/react-router'
+import { Link, Outlet, useChildMatches } from '@tanstack/react-router'
+import { ArrowLeftIcon } from 'lucide-react'
 
 import { ChatList } from '@/features/chats'
 import { useLiveEventsStatus, type LiveEventsStatus } from '@/shared/api'
+import { Button } from '@/shared/components/ui/button'
 
 const STREAM_NOTICES: Partial<Record<LiveEventsStatus, string>> = {
   reconnecting: 'Reconnecting…',
@@ -18,9 +20,15 @@ export function ChatsPage() {
 
   return (
     <main className="grid h-svh grid-cols-[320px_1fr] grid-rows-[auto_1fr]">
-      <output className="col-span-2">
-        {streamNotice}
-      </output>
+      <header className="col-span-2 flex items-center gap-4 p-2">
+        <Button asChild variant="ghost" size="sm">
+          <Link to="/">
+            <ArrowLeftIcon data-icon="inline-start" aria-hidden="true" />
+            Home
+          </Link>
+        </Button>
+        <output>{streamNotice}</output>
+      </header>
       <aside className="min-h-0">
         <ChatList />
       </aside>
