@@ -1,8 +1,8 @@
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
-import type { Chat, ChatPage, Message, MessagePage } from '../model/chat'
-import { moveChatToTop, removeMessage, upsertMessage } from './chat-cache'
+import { moveChatToTop, removeMessage, upsertMessage } from '@/features/chats/api/chat-cache'
+import type { Chat, ChatPage, Message, MessagePage } from '@/features/chats/model/chat'
 
 function message(id: string, createdAt: string, overrides: Partial<Message> = {}): Message {
   return {

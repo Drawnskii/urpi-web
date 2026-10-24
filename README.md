@@ -37,7 +37,7 @@ src/
     router.ts          router instance, type registration
     query-client.ts    QueryClient defaults
     providers.tsx      QueryClientProvider
-    http.ts            default request headers (X-Tenant-ID)
+    http.ts            default request headers and stream params (tenant, member)
     route-tree.gen.ts  generated, do not edit
   pages/               route-level screens; compose features, little logic
   features/            one folder per business feature, public API in index.ts
@@ -45,6 +45,9 @@ src/
     api/               http client and ApiError
     config/            env
     components/  hooks/  lib/  types/
+tests/                 outside the app, like the backend: by level, then the tested path
+  unit/                pure logic (Vitest)
+  fakes/               shared test doubles, imported as @tests/fakes/...
 ```
 
 Dependencies only flow downward: `app → pages → features → shared`. Oxlint (`.oxlintrc.json`) enforces it:
