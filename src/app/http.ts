@@ -12,5 +12,8 @@ export function setupHttp() {
       if (env.tenantMemberId) headers['X-Tenant-Member-ID'] = env.tenantMemberId
       return headers
     },
+    // Streams (EventSource) can't send headers: the same ids, in the query string.
+    // TODO(auth): a short-lived stream ticket instead of ids in the URL
+    getStreamParams: () => ({ tenant_id: env.tenantId, member_id: env.tenantMemberId }),
   })
 }
