@@ -1,4 +1,4 @@
-import { infiniteQueryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
 import { chatApi } from './chat-api'
 
@@ -39,4 +39,14 @@ export const chatQueries = {
           ? { id: lastPage.next_before_id, createdAt: lastPage.next_before_created_at }
           : undefined,
     }),
+}
+
+// The newest client message in the cache. Reads the same cache entry as the message list
+// (no request); select re-renders only when this id changes
+export function useLatestClientMessageId(chatId: string) {
+  return useSuspenseInfiniteQuery({
+    ...chatQueries.messages(chatId),
+    select: (data) =>
+      data.pages.flatMap((page) => page.messages).find((message) => message.sender_type === 'CLIENT')?.id,
+  }).data
 }

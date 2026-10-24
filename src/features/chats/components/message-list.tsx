@@ -6,6 +6,7 @@ import { ScrollArea } from '@/shared/components/ui/scroll-area'
 import { cn } from '@/shared/lib/utils'
 
 import { chatQueries } from '../api/chat-queries'
+import { useReadReceipts } from '../hooks/use-read-receipts'
 
 interface MessageListProps {
   chatId: string
@@ -13,7 +14,8 @@ interface MessageListProps {
 
 export function MessageList({ chatId }: MessageListProps) {
   const { data } = useSuspenseInfiniteQuery(chatQueries.messages(chatId))
-  
+  useReadReceipts(chatId)
+
   const bottomRef = useRef<HTMLDivElement>(null)
 
   // The API sends newest first; a chat reads oldest at the top

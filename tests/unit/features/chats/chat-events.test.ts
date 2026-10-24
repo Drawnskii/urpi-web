@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query'
 import { describe, expect, it, vi } from 'vitest'
 
-import { chatLiveEvents } from './chat-events'
+import { chatLiveEvents } from '@/features/chats/api/chat-events'
 
 const message = {
   id: 'm2',
