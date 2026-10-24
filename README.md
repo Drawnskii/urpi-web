@@ -24,6 +24,7 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running for pag
 | `pnpm routes`    | Regenerate `src/app/route-tree.gen.ts`       |
 | `pnpm lint`      | Run oxlint (`pnpm lint:fix` to fix)          |
 | `pnpm preview`   | Preview the production build                 |
+| `pnpm test`      | Run the unit tests (Vitest)                  |
 
 ## Architecture (feature-driven)
 
