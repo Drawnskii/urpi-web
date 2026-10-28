@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ChatsRouteImport } from './routes/chats'
 import { Route as TemplatesRouteImport } from './routes/templates'
+import { Route as WhatsappRouteImport } from './routes/whatsapp'
 import { Route as ChatsChatIdRouteImport } from './routes/chats.$chatId'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const TemplatesRoute = TemplatesRouteImport.update({
   path: '/templates',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WhatsappRoute = WhatsappRouteImport.update({
+  id: '/whatsapp',
+  path: '/whatsapp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ChatsChatIdRoute = ChatsChatIdRouteImport.update({
   id: '/$chatId',
   path: '/$chatId',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/chats': typeof ChatsRouteWithChildren
   '/templates': typeof TemplatesRoute
+  '/whatsapp': typeof WhatsappRoute
   '/chats/$chatId': typeof ChatsChatIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chats': typeof ChatsRouteWithChildren
   '/templates': typeof TemplatesRoute
+  '/whatsapp': typeof WhatsappRoute
   '/chats/$chatId': typeof ChatsChatIdRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,23 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/chats': typeof ChatsRouteWithChildren
   '/templates': typeof TemplatesRoute
+  '/whatsapp': typeof WhatsappRoute
   '/chats/$chatId': typeof ChatsChatIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chats' | '/templates' | '/chats/$chatId'
+  fullPaths: '/' | '/chats' | '/templates' | '/whatsapp' | '/chats/$chatId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chats' | '/templates' | '/chats/$chatId'
-  id: '__root__' | '/' | '/chats' | '/templates' | '/chats/$chatId'
+  to: '/' | '/chats' | '/templates' | '/whatsapp' | '/chats/$chatId'
+  id:
+    '__root__' | '/' | '/chats' | '/templates' | '/whatsapp' | '/chats/$chatId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChatsRoute: typeof ChatsRouteWithChildren
   TemplatesRoute: typeof TemplatesRoute
+  WhatsappRoute: typeof WhatsappRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -89,6 +100,13 @@ declare module '@tanstack/react-router' {
       path: '/templates'
       fullPath: '/templates'
       preLoaderRoute: typeof TemplatesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/whatsapp': {
+      id: '/whatsapp'
+      path: '/whatsapp'
+      fullPath: '/whatsapp'
+      preLoaderRoute: typeof WhatsappRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chats/$chatId': {
@@ -115,6 +133,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChatsRoute: ChatsRouteWithChildren,
   TemplatesRoute: TemplatesRoute,
+  WhatsappRoute: WhatsappRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

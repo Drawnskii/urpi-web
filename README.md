@@ -38,9 +38,10 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running: every 
 
 | Route | Feature | What it does |
 | --- | --- | --- |
-| `/` | | Home: open chats, connect WhatsApp, manage templates |
+| every page | | App shell: a sidebar with the three sections (a sheet on phones) |
+| `/` | | Home: links to chats, WhatsApp number and templates |
 | `/chats`, `/chats/$chatId` | `chats` | Inbox and one chat: live messages, optimistic replies, read receipts, typing indicator |
-| `/` (Connect WhatsApp) | `whatsapp-connection` | Connect the tenant's number through Meta's Embedded Signup; disabled once connected |
+| `/whatsapp` | `whatsapp-connection` | Connect the tenant's number through Meta's Embedded Signup; disabled once connected |
 | `/templates` | `message-templates` | Create message templates and follow Meta's review and re-categorizations |
 
 ## Architecture (feature-driven)
@@ -53,9 +54,10 @@ src/
     app.tsx            Providers + RouterProvider
     router.ts          router instance, type registration
     query-client.ts    QueryClient defaults
-    providers.tsx      QueryClientProvider
+    providers.tsx      QueryClientProvider, TooltipProvider
     http.ts            default request headers and stream params (tenant, member)
     live-events.ts     the app's one live events stream, with each feature's handlers
+    layout/            the app shell: sidebar (with the brand) and page area
     route-tree.gen.ts  generated, do not edit
   pages/               route-level screens; compose features, little logic
   features/            one folder per business feature, public API in index.ts

@@ -3,6 +3,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
+import { AppShell } from '@/app/layout/app-shell'
 import { useLiveEvents } from '@/app/live-events'
 
 export interface RouterContext {
@@ -18,7 +19,9 @@ function RootComponent() {
 
   return (
     <>
-      <Outlet />
+      <AppShell>
+        <Outlet />
+      </AppShell>
       {import.meta.env.DEV && (
         <>
           <TanStackRouterDevtools position="bottom-right" />

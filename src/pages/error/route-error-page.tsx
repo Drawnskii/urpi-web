@@ -16,12 +16,12 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
   const title = isApiError(error) && error.isNotFound ? 'Not found' : 'Something went wrong'
 
   return (
-    <main role="alert">
+    <div role="alert" className="flex flex-1 flex-col items-start gap-3 p-6">
       <h1>{title}</h1>
       <p>{error instanceof Error ? error.message : String(error)}</p>
       <button type="button" onClick={() => router.invalidate()}>
         Try again
       </button>
-    </main>
+    </div>
   )
 }
