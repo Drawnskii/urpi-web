@@ -38,7 +38,7 @@ export function ConnectWhatsApp() {
 
   if (!signup.isConfigured) {
     return (
-      <p role="alert">
+      <p role="alert" className="text-body-sm text-destructive">
         Embedded Signup isn't configured. Set VITE_WHATSAPP_APP_ID and VITE_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID in
         .env (the backend's Meta app and its Embedded Signup configuration).
       </p>
@@ -71,7 +71,7 @@ export function ConnectWhatsApp() {
       {isConnected ? (
         <>
           <p>Connected: {connection.phone_number}</p>
-          <p>
+          <p className="text-body-sm text-muted-foreground">
             To send templates or write after 24 hours, add a payment method in{' '}
             <a href={WHATSAPP_MANAGER_URL} target="_blank" rel="noreferrer">
               WhatsApp Manager
@@ -81,15 +81,15 @@ export function ConnectWhatsApp() {
         </>
       ) : (
         <>
-          {!signup.isReady && !signup.sdkError && <p>Loading Meta's signup…</p>}
-          {signup.sdkError && <p role="alert">{signup.sdkError}</p>}
+          {!signup.isReady && !signup.sdkError && <p className="text-body-sm text-muted-foreground">Loading Meta's signup…</p>}
+          {signup.sdkError && <p role="alert" className="text-body-sm text-destructive">{signup.sdkError}</p>}
           {signup.interruption?.kind === 'failed' ? (
-            <div role="alert">
-              <p>
+            <div role="alert" className="flex flex-col gap-1">
+              <p className="text-body-sm text-destructive">
                 Meta stopped the signup{signup.interruption.error.message ? `: ${signup.interruption.error.message}` : '.'}
               </p>
               {(signup.interruption.error.code || signup.interruption.error.sessionId) && (
-                <small>
+                <small className="text-muted-foreground">
                   {[
                     signup.interruption.error.code && `Error code ${signup.interruption.error.code}`,
                     signup.interruption.error.sessionId && `Session ${signup.interruption.error.sessionId}`,
@@ -102,11 +102,11 @@ export function ConnectWhatsApp() {
             </div>
           ) : (
             signup.interruption && (
-              <p>{interruptionText(signup.interruption)}</p>
+              <p className="text-body-sm text-muted-foreground">{interruptionText(signup.interruption)}</p>
             )
           )}
           {isConnecting && <p>Your number {connection.phone_number} is saved, but Meta hasn't finished setting it up.</p>}
-          {error && <p role="alert">{connectErrorText(error)}</p>}
+          {error && <p role="alert" className="text-body-sm text-destructive">{connectErrorText(error)}</p>}
         </>
       )}
 

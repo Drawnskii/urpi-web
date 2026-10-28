@@ -27,7 +27,7 @@ export function MessageList({ chatId }: MessageListProps) {
     if (lastMessageId) bottomRef.current?.scrollIntoView({ block: 'end' })
   }, [lastMessageId])
 
-  if (messages.length === 0) return <p className="flex-1">No messages yet</p>
+  if (messages.length === 0) return <p className="flex-1 p-4 text-muted-foreground">No messages yet</p>
 
   return (
     <ScrollArea className="min-h-0 flex-1">
@@ -45,7 +45,7 @@ export function MessageList({ chatId }: MessageListProps) {
                 <Badge variant={message.status === 'FAILED' ? 'destructive' : 'secondary'}>{message.status}</Badge>
               )}
             </div>
-            {message.failure_reason && <p role="alert">{message.failure_reason}</p>}
+            {message.failure_reason && <p role="alert" className="text-body-sm text-destructive">{message.failure_reason}</p>}
           </li>
         ))}
       </ol>

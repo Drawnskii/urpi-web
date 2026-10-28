@@ -12,7 +12,7 @@ export function ChatList() {
   const { data } = useSuspenseInfiniteQuery(chatQueries.list())
   const chats = data.pages.flatMap((page) => page.chats)
 
-  if (chats.length === 0) return <p>No chats yet</p>
+  if (chats.length === 0) return <p className="p-4 text-muted-foreground">No chats yet</p>
 
   return (
     <ScrollArea className="h-full">

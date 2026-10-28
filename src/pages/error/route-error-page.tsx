@@ -3,6 +3,7 @@ import { useRouter, type ErrorComponentProps } from '@tanstack/react-router'
 import { useEffect } from 'react'
 
 import { isApiError } from '@/shared/api'
+import { Button } from '@/shared/components/ui/button'
 
 export function RouteErrorPage({ error }: ErrorComponentProps) {
   const router = useRouter()
@@ -18,10 +19,10 @@ export function RouteErrorPage({ error }: ErrorComponentProps) {
   return (
     <div role="alert" className="flex flex-1 flex-col items-start gap-3 p-6">
       <h1>{title}</h1>
-      <p>{error instanceof Error ? error.message : String(error)}</p>
-      <button type="button" onClick={() => router.invalidate()}>
+      <p className="text-muted-foreground">{error instanceof Error ? error.message : String(error)}</p>
+      <Button type="button" variant="outline" onClick={() => router.invalidate()}>
         Try again
-      </button>
+      </Button>
     </div>
   )
 }

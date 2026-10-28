@@ -56,7 +56,7 @@ export function MessageComposer({ chatId }: MessageComposerProps) {
           Send
         </Button>
       </div>
-      {addMessage.isError && <p role="alert">{addMessage.error.message}</p>}
+      {addMessage.isError && <p role="alert" className="text-body-sm text-destructive">{addMessage.error.message}</p>}
     </form>
   )
 }
