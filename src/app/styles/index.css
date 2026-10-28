@@ -99,6 +99,37 @@
   --sidebar-ring: oklch(0.4280 0.0350 215);
 }
 
+/* Type scale: text-display … text-caption set size, line height and weight together.
+   Font family comes from the typography roles below (headings sans, body serif, labels mono) */
+@theme {
+  --text-display: 3rem;
+  --text-display--line-height: 1.1;
+  --text-display--font-weight: 600;
+  --text-h1: 2.25rem;
+  --text-h1--line-height: 1.2;
+  --text-h1--font-weight: 600;
+  --text-h2: 1.75rem;
+  --text-h2--line-height: 1.25;
+  --text-h2--font-weight: 600;
+  --text-h3: 1.25rem;
+  --text-h3--line-height: 1.35;
+  --text-h3--font-weight: 600;
+  --text-h4: 1.0625rem;
+  --text-h4--line-height: 1.4;
+  --text-h4--font-weight: 600;
+  --text-body-lg: 1.125rem;
+  --text-body-lg--line-height: 1.6;
+  --text-body: 1rem;
+  --text-body--line-height: 1.6;
+  --text-body-sm: 0.875rem;
+  --text-body-sm--line-height: 1.5;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.4;
+  --text-label--font-weight: 500;
+  --text-caption: 0.75rem;
+  --text-caption--line-height: 1.4;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -168,15 +199,63 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Typography roles: serif for body text (the default), sans for titles and headings, mono for
+     labels, badges and small text. A font-* class still overrides any of them */
   html {
-    @apply font-sans antialiased;
+    @apply font-serif antialiased;
     color-scheme: light;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  [data-slot="sheet-title"] {
+    @apply font-heading;
+  }
+  /* The sidebar is navigation, not reading: sans, like titles (badges and labels inside stay mono) */
+  [data-slot="sidebar"] {
+    @apply font-sans;
+  }
+  h1 {
+    @apply text-h1;
+  }
+  h2 {
+    @apply text-h2;
+  }
+  h3 {
+    @apply text-h3;
+  }
+  h4,
+  h5,
+  h6 {
+    @apply text-h4;
+  }
+  label,
+  legend {
+    @apply text-label;
+  }
+  small,
+  time {
+    @apply text-caption;
+  }
+  label,
+  legend,
+  small,
+  time,
+  [data-slot="badge"],
+  [data-slot="label"],
+  [data-slot="sidebar-group-label"],
+  [data-slot="sidebar-menu-badge"],
+  [data-slot="tooltip-content"] {
+    @apply font-mono;
   }
   html.dark {
     color-scheme: dark;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-body text-foreground;
     letter-spacing: var(--tracking-normal);
   }
 }

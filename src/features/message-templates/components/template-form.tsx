@@ -5,7 +5,7 @@ import { fieldErrorsFrom, isApiError } from '@/shared/api'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
 import { Label } from '@/shared/components/ui/label'
-import { NativeSelect, NativeSelectOption } from '@/shared/components/ui/native-select'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/components/ui/select'
 import { Textarea } from '@/shared/components/ui/textarea'
 
 import { useCreateMessageTemplate } from '../api/message-template-mutations'
@@ -49,9 +49,8 @@ export function TemplateForm() {
   // One example input per variable, as the tenant types the body
   const variables = templateVariables(values.body)
 
-  function handleChange(field: 'language' | 'body') {
-    return (event: ChangeEvent<HTMLSelectElement | HTMLTextAreaElement>) =>
-      setValues((current) => ({ ...current, [field]: event.target.value }))
+  function handleBodyChange(event: ChangeEvent<HTMLTextAreaElement>) {
+    setValues((current) => ({ ...current, body: event.target.value }))
   }
 
   function handleExampleChange(variable: string, value: string) {
@@ -92,38 +91,50 @@ export function TemplateForm() {
           aria-describedby={errors.name ? 'template-name-error' : 'template-name-hint'}
         />
         {errors.name ? (
-          <p id="template-name-error" role="alert">{errors.name}</p>
+          <p id="template-name-error" role="alert" className="text-body-sm text-destructive">{errors.name}</p>
         ) : (
-          <p id="template-name-hint">Lowercase letters, digits and _. Spaces become _.</p>
+          <p id="template-name-hint" className="text-body-sm text-muted-foreground">Lowercase letters, digits and _. Spaces become _.</p>
         )}
       </div>
 
       <div className="flex flex-wrap gap-4">
-        <div className="flex flex-col gap-1">
+        <div className="flex min-w-48 flex-1 flex-col gap-1">
           <Label htmlFor="template-category">Category</Label>
-          <NativeSelect
-            id="template-category"
+          <Select
             value={values.category}
-            onChange={(event) =>
-              setValues((current) => ({ ...current, category: event.target.value as MessageTemplateCategory }))
+            onValueChange={(category) =>
+              setValues((current) => ({ ...current, category: category as MessageTemplateCategory }))
             }
           >
-            {CATEGORIES.map((category) => (
-              <NativeSelectOption key={category.value} value={category.value}>
-                {category.label}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+            <SelectTrigger id="template-category" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {CATEGORIES.map((category) => (
+                <SelectItem key={category.value} value={category.value}>
+                  {category.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex min-w-48 flex-1 flex-col gap-1">
           <Label htmlFor="template-language">Language</Label>
-          <NativeSelect id="template-language" value={values.language} onChange={handleChange('language')}>
-            {LANGUAGES.map((language) => (
-              <NativeSelectOption key={language.value} value={language.value}>
-                {language.label}
-              </NativeSelectOption>
-            ))}
-          </NativeSelect>
+          <Select
+            value={values.language}
+            onValueChange={(language) => setValues((current) => ({ ...current, language }))}
+          >
+            <SelectTrigger id="template-language" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {LANGUAGES.map((language) => (
+                <SelectItem key={language.value} value={language.value}>
+                  {language.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
@@ -132,16 +143,16 @@ export function TemplateForm() {
         <Textarea
           id="template-body"
           value={values.body}
-          onChange={handleChange('body')}
+          onChange={handleBodyChange}
           placeholder="Hola {{client_name}}, tu reserva quedó confirmada."
           maxLength={TEMPLATE_BODY_MAX_LENGTH}
           aria-invalid={Boolean(errors.body)}
           aria-describedby={errors.body ? 'template-body-error' : 'template-body-hint'}
         />
         {errors.body ? (
-          <p id="template-body-error" role="alert">{errors.body}</p>
+          <p id="template-body-error" role="alert" className="text-body-sm text-destructive">{errors.body}</p>
         ) : (
-          <p id="template-body-hint">
+          <p id="template-body-hint" className="text-body-sm text-muted-foreground">
             Write variables as {'{{client_name}}'}: lowercase and _. Not at the very start or end.
           </p>
         )}
@@ -162,7 +173,7 @@ export function TemplateForm() {
                   aria-invalid={Boolean(error)}
                   aria-describedby={error ? `template-example-${variable}-error` : undefined}
                 />
-                {error && <p id={`template-example-${variable}-error`} role="alert">{error}</p>}
+                {error && <p id={`template-example-${variable}-error`} role="alert" className="text-body-sm text-destructive">{error}</p>}
               </div>
             )
           })}
@@ -171,17 +182,17 @@ export function TemplateForm() {
 
       {values.body.trim() && (
         <div className="flex flex-col gap-1">
-          <span>Preview</span>
+          <span className="text-label font-mono">Preview</span>
           <p className="whitespace-pre-wrap">{previewTemplate(values.body.trim(), values.examples)}</p>
         </div>
       )}
 
       {hasNoNumber && (
-        <p role="alert">
+        <p role="alert" className="text-body-sm text-destructive">
           Connect a WhatsApp number first: templates belong to it. <Link to="/">Go to the home page</Link>
         </p>
       )}
-      {formError && <p role="alert">{formError}</p>}
+      {formError && <p role="alert" className="text-body-sm text-destructive">{formError}</p>}
 
       <Button type="submit" disabled={createTemplate.isPending} className="self-start">
         {createTemplate.isPending ? 'Sending to Meta…' : "Send to Meta's review"}

@@ -37,7 +37,7 @@ export function ConnectWhatsApp() {
 
   if (!signup.isConfigured) {
     return (
-      <p role="alert">
+      <p role="alert" className="text-body-sm text-destructive">
         Embedded Signup isn't configured. Set VITE_WHATSAPP_APP_ID and VITE_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID in
         .env (the backend's Meta app and its Embedded Signup configuration).
       </p>
@@ -70,7 +70,7 @@ export function ConnectWhatsApp() {
       {isConnected ? (
         <>
           <p>Connected: {connection.phone_number}</p>
-          <p>
+          <p className="text-body-sm text-muted-foreground">
             To send templates or write after 24 hours, add a payment method in{' '}
             <a href={WHATSAPP_MANAGER_URL} target="_blank" rel="noreferrer">
               WhatsApp Manager
@@ -80,11 +80,11 @@ export function ConnectWhatsApp() {
         </>
       ) : (
         <>
-          {!signup.isReady && !signup.sdkError && <p>Loading Meta's signup…</p>}
-          {signup.sdkError && <p role="alert">{signup.sdkError}</p>}
-          {signup.interruption && <p>{interruptionText(signup.interruption)}</p>}
+          {!signup.isReady && !signup.sdkError && <p className="text-body-sm text-muted-foreground">Loading Meta's signup…</p>}
+          {signup.sdkError && <p role="alert" className="text-body-sm text-destructive">{signup.sdkError}</p>}
+          {signup.interruption && <p className="text-body-sm text-muted-foreground">{interruptionText(signup.interruption)}</p>}
           {isConnecting && <p>Your number {connection.phone_number} is saved, but Meta hasn't finished setting it up.</p>}
-          {error && <p role="alert">{error.message}</p>}
+          {error && <p role="alert" className="text-body-sm text-destructive">{error.message}</p>}
         </>
       )}
 
