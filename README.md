@@ -44,28 +44,38 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running: every 
 | `/whatsapp` | `whatsapp-connection` | Connect the tenant's number through Meta's Embedded Signup; disabled once connected |
 | `/templates` | `message-templates` | Create message templates and follow Meta's review and re-categorizations |
 
+## Brand and theme
+
+- **Tokens** are shadcn's theme variables in `src/app/styles/index.css`: light values in `:root`, dark in `.dark`, exposed as classes (`bg-primary`, `text-muted-foreground`, `rounded-lg`, `font-serif`). Desaturated blue-teal `primary`, lime `secondary`, radius `0.35rem`.
+- **Fonts:** Roboto Serif for body text (the default), Work Sans for titles, headings and the sidebar, Fira Mono for labels, badges and small text; from Fontsource, bundled with the app (no Google Fonts request).
+- **Type scale:** `text-display`, `text-h1`…`text-h4`, `text-body-lg`, `text-body`, `text-body-sm`, `text-label`, `text-caption` (size, line height and weight); headings, body, labels and `small`/`time` use them by default.
+- **Logos:** `CombinationMark` (expanded sidebar) and `BrandMark` (collapsed sidebar, favicon) in `src/shared/components/brand/`, drawn in `currentColor`.
+- **Light/dark:** the toggle at the right of the header; saved in `localStorage`, the system's until chosen, applied before the first paint.
+- Use roles, never raw colors, and give every new color a dark value. Details in the guide, section 6.
+
 ## Architecture (feature-driven)
 
 ```
 src/
   app/                 bootstrap and wiring, knows about everything
     routes/            TanStack Router file routes (thin: loader + page component)
-    styles/            global CSS (Tailwind and the shadcn theme)
+    styles/            global CSS: Tailwind, the brand theme (light and dark) and its fonts
     app.tsx            Providers + RouterProvider
     router.ts          router instance, type registration
     query-client.ts    QueryClient defaults
     providers.tsx      QueryClientProvider, TooltipProvider
     http.ts            default request headers and stream params (tenant, member)
     live-events.ts     the app's one live events stream, with each feature's handlers
-    layout/            the app shell: sidebar (with the brand) and page area
+    layout/            the app shell: sidebar (with the logo), header with the theme toggle, page area
     route-tree.gen.ts  generated, do not edit
   pages/               route-level screens; compose features, little logic
   features/            one folder per business feature, public API in index.ts
   shared/              generic, feature-agnostic code
     api/               http client, ApiError, the live events stream
     components/ui/     shadcn components
+    components/brand/  the logos (BrandMark, CombinationMark)
     config/            env
-    hooks/  lib/  types/
+    hooks/  lib/  types/   lib/ holds the theme store (light/dark)
 tests/                 outside the app, like the backend: by level, then the tested path
   unit/                pure logic (Vitest)
   fakes/               shared test doubles, imported as @tests/fakes/...
