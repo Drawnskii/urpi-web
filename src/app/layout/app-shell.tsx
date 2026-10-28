@@ -4,6 +4,7 @@ import { Separator } from '@/shared/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/shared/components/ui/sidebar'
 
 import { AppSidebar } from './app-sidebar'
+import { ThemeToggle } from './theme-toggle'
 
 interface AppShellProps {
   children: ReactNode
@@ -24,6 +25,9 @@ export function AppShell({ children }: AppShellProps) {
           </div>
           {/* Stretches to the header's full height (the separator's default) */}
           <Separator orientation="vertical" />
+          <div className="ml-auto flex size-12 shrink-0 items-center justify-center">
+            <ThemeToggle />
+          </div>
         </header>
         {/* Each page's root takes flex-1 to fill it top to bottom; long pages scroll here */}
         <div className="flex min-h-0 flex-1 flex-col overflow-auto">{children}</div>
