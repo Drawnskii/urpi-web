@@ -1,11 +1,10 @@
 import { Link } from '@tanstack/react-router'
 
-import { ConnectWhatsApp } from '@/features/whatsapp-connection'
 import { Button } from '@/shared/components/ui/button'
 
 export function HomePage() {
   return (
-    <main className="mx-auto grid min-h-svh max-w-6xl content-center gap-10 p-6 md:grid-cols-3">
+    <div className="mx-auto grid w-full max-w-6xl flex-1 content-center gap-10 p-6 md:grid-cols-3">
       <section className="flex flex-col items-start gap-3">
         <h2>Chats</h2>
         <p>Read and answer your clients' WhatsApp conversations.</p>
@@ -17,7 +16,9 @@ export function HomePage() {
       <section className="flex flex-col items-start gap-3">
         <h2>WhatsApp number</h2>
         <p>Connect your business's WhatsApp number through Meta.</p>
-        <ConnectWhatsApp />
+        <Button asChild>
+          <Link to="/whatsapp">Set up your number</Link>
+        </Button>
       </section>
 
       <section className="flex flex-col items-start gap-3">
@@ -27,6 +28,6 @@ export function HomePage() {
           <Link to="/templates">Manage templates</Link>
         </Button>
       </section>
-    </main>
+    </div>
   )
 }

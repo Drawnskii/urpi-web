@@ -1,9 +1,7 @@
-import { Link, Outlet, useChildMatches } from '@tanstack/react-router'
-import { ArrowLeftIcon } from 'lucide-react'
+import { Outlet, useChildMatches } from '@tanstack/react-router'
 
 import { ChatList } from '@/features/chats'
 import { useLiveEventsStatus, type LiveEventsStatus } from '@/shared/api'
-import { Button } from '@/shared/components/ui/button'
 
 const STREAM_NOTICES: Partial<Record<LiveEventsStatus, string>> = {
   reconnecting: 'Reconnecting…',
@@ -19,22 +17,17 @@ export function ChatsPage() {
   const streamNotice = STREAM_NOTICES[streamStatus]
 
   return (
-    <main className="grid h-svh grid-cols-[320px_1fr] grid-rows-[auto_1fr]">
-      <header className="col-span-2 flex items-center gap-4 p-2">
-        <Button asChild variant="ghost" size="sm">
-          <Link to="/">
-            <ArrowLeftIcon data-icon="inline-start" aria-hidden="true" />
-            Home
-          </Link>
-        </Button>
-        <output>{streamNotice}</output>
-      </header>
-      <aside className="min-h-0">
-        <ChatList />
-      </aside>
-      <section className="flex min-h-0 flex-col">
-        {hasSelectedChat ? <Outlet /> : <p className="m-auto">Select a chat</p>}
-      </section>
-    </main>
+    <div className="flex min-h-0 flex-1 flex-col">
+      <output className="border-b px-3 py-1 empty:hidden">{streamNotice}</output>
+      {/* Fills the rest of the height, so the list's border runs top to bottom with any number of chats */}
+      <div className="grid min-h-0 flex-1 grid-cols-[320px_1fr]">
+        <aside className="min-h-0 border-r">
+          <ChatList />
+        </aside>
+        <section className="flex min-h-0 flex-col">
+          {hasSelectedChat ? <Outlet /> : <p className="m-auto">Select a chat</p>}
+        </section>
+      </div>
+    </div>
   )
 }
