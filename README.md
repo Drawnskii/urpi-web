@@ -41,7 +41,7 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running: every 
 | every page | | App shell: a sidebar with the three sections (a sheet on phones) |
 | `/` | | Home: links to chats, WhatsApp number and templates |
 | `/chats`, `/chats/$chatId` | `chats` | Inbox (each chat named by a member's title, else the client's WhatsApp name, else "Untitled chat", renamed inline with the pencil; the client's name and number in an info popover; last message, its time and an unread badge per chat, live) and one chat: live messages as bubbles with delivery ticks (long words wrap), grouped by day under a sticky date, optimistic replies, read receipts, typing indicator |
-| `/whatsapp` | `whatsapp-connection` | Connect the tenant's number through Meta's Embedded Signup; disabled once connected |
+| `/whatsapp` | `whatsapp-connection` | Connect the tenant's number through Meta's Embedded Signup; Disconnect it, live from any tab or by Meta |
 | `/templates` | `message-templates` | Create message templates and follow Meta's review and re-categorizations |
 
 ## Brand and theme
