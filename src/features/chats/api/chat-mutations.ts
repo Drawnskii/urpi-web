@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 
-import type { AddMessageInput, Message, MessagePage } from '../model/chat'
+import type { AddMessageInput, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
 import { chatApi } from './chat-api'
-import { removeMessage, upsertMessage } from './chat-cache'
+import { removeMessage, setChatTitle, upsertMessage } from './chat-cache'
 import { chatKeys } from './chat-queries'
 
 // Three things arrive in any order: the optimistic message, the POST's 201 and message.created
@@ -73,4 +73,27 @@ export function useMarkChatRead(chatId: string) {
 // "typing…" for about 25 s, and the blue ticks
 export function useShowTyping(chatId: string) {
   return useReadReceiptMutation(chatId, chatApi.showTyping)
+}
+
+// Optimistic (the guide's exception): the field turns back into the label at once, and waiting for
+// the server would show the old name meanwhile. The saved name replaces it; a failure restores the old one
+export function useRenameChat(chatId: string) {
+  const queryClient = useQueryClient()
+  const queryKey = chatKeys.list()
+
+  return useMutation({
+    mutationFn: (input: RenameChatInput) => chatApi.rename(chatId, input),
+    onMutate: async ({ title }) => {
+      await queryClient.cancelQueries({ queryKey })
+      const previous = queryClient.getQueryData<InfiniteData<ChatPage>>(queryKey)
+      queryClient.setQueryData<InfiniteData<ChatPage>>(queryKey, (data) => setChatTitle(data, chatId, title))
+      return { previous }
+    },
+    onSuccess: (saved) => {
+      queryClient.setQueryData<InfiniteData<ChatPage>>(queryKey, (data) => setChatTitle(data, chatId, saved.title))
+    },
+    onError: (_error, _input, onMutateResult) => {
+      if (onMutateResult?.previous) queryClient.setQueryData(queryKey, onMutateResult.previous)
+    },
+  })
 }
