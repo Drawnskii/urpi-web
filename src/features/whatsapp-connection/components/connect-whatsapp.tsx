@@ -7,6 +7,7 @@ import { useFinishWhatsAppConnection } from '../api/whatsapp-connection-mutation
 import { whatsAppConnectionQueries } from '../api/whatsapp-connection-queries'
 import { useEmbeddedSignup, type SignupInterruption } from '../hooks/use-embedded-signup'
 import { connectErrorText } from '../model/connect-error'
+import { DisconnectWhatsApp } from './disconnect-whatsapp'
 
 // Payment methods have no API: the business adds one in WhatsApp Manager (roadmap T8)
 const WHATSAPP_MANAGER_URL = 'https://business.facebook.com/wa/manage/home/'
@@ -114,6 +115,18 @@ export function ConnectWhatsApp() {
         <Button type="button" variant="outline" onClick={() => finish.mutate()} disabled={isBusy}>
           Retry
         </Button>
+      )}
+
+      {/* CONNECTING too: a number Meta never finished can be dropped and connected again */}
+      {connection && !isBusy && (
+        <DisconnectWhatsApp
+          connection={connection}
+          // The last attempt's result or error belongs to the number that's gone
+          onDisconnected={() => {
+            finish.reset()
+            signup.connection.reset()
+          }}
+        />
       )}
     </div>
   )
