@@ -1,5 +1,5 @@
 import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 
 import { Badge } from '@/shared/components/ui/badge'
 import { ScrollArea } from '@/shared/components/ui/scroll-area'
@@ -12,9 +12,11 @@ import { MessageBubble } from './message-bubble'
 
 interface MessageListProps {
   chatId: string
+  // The composer: pinned to the bottom of the scroll area, so messages scroll under its card
+  children?: ReactNode
 }
 
-export function MessageList({ chatId }: MessageListProps) {
+export function MessageList({ chatId, children }: MessageListProps) {
   const { data } = useSuspenseInfiniteQuery(chatQueries.messages(chatId))
   useReadReceipts(chatId)
 
@@ -31,11 +33,12 @@ export function MessageList({ chatId }: MessageListProps) {
     if (lastMessageId) bottomRef.current?.scrollIntoView({ block: 'end' })
   }, [lastMessageId])
 
-  if (messages.length === 0) return <p className="flex-1 p-4 text-muted-foreground">No messages yet</p>
-
   return (
-    <ScrollArea className="min-h-0 flex-1">
-      <ol className="flex flex-col gap-3 p-4">
+    // Radix wraps the content in a display: table div; as a full-height flex column instead, the
+    // list fills the space and the footer sits at the bottom even with few messages
+    <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:flex! [&_[data-slot=scroll-area-viewport]>div]:min-h-full [&_[data-slot=scroll-area-viewport]>div]:flex-col">
+      {messages.length === 0 && <p className="flex-1 p-4 text-muted-foreground">No messages yet</p>}
+      <ol className="flex flex-1 flex-col gap-3 p-4 empty:hidden">
         {days.map((group) => (
           <li key={group.day} className="flex flex-col gap-3">
             {/* Sticky inside its own day: it stays pinned while that day is on screen and scrolls
@@ -53,6 +56,10 @@ export function MessageList({ chatId }: MessageListProps) {
           </li>
         ))}
       </ol>
+      {/* Sticky at the bottom, so messages pass under the composer's card; the space around the card
+          is transparent and lets clicks through. Part of the scrolled content, so the newest
+          message rests just above it */}
+      <div className="pointer-events-none sticky bottom-0 z-20 [&_*]:pointer-events-auto [&>form]:pointer-events-none">{children}</div>
       <div ref={bottomRef} />
     </ScrollArea>
   )
