@@ -22,11 +22,12 @@ export function ChatsPage() {
       <h1 className="sr-only">Chats</h1>
       <output className="border-b px-3 py-1 text-body-sm empty:hidden">{streamNotice}</output>
       {/* Fills the rest of the height, so the list's border runs top to bottom with any number of chats */}
-      <div className="grid min-h-0 flex-1 grid-cols-[320px_1fr]">
+      {/* minmax(0, 1fr): the open chat never grows past its column, so the list always stays in view */}
+      <div className="grid min-h-0 flex-1 grid-cols-[320px_minmax(0,1fr)]">
         <aside className="min-h-0 border-r">
           <ChatList />
         </aside>
-        <section className="flex min-h-0 flex-col">
+        <section className="flex min-h-0 min-w-0 flex-col">
           {hasSelectedChat ? <Outlet /> : <p className="m-auto text-muted-foreground">Select a chat</p>}
         </section>
       </div>
