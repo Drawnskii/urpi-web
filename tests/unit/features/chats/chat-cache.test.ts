@@ -1,7 +1,7 @@
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
-import { moveChatToTop, removeMessage, upsertMessage } from '@/features/chats/api/chat-cache'
+import { applyMessageToChats, moveChatToTop, removeMessage, setUnreadCount, upsertMessage } from '@/features/chats/api/chat-cache'
 import type { Chat, ChatPage, Message, MessagePage } from '@/features/chats/model/chat'
 
 function message(id: string, createdAt: string, overrides: Partial<Message> = {}): Message {
@@ -27,8 +27,8 @@ function messagePages(pages: Message[][], hasOlder = false): InfiniteData<Messag
   }
 }
 
-function chat(id: string): Chat {
-  return { id, client_id: `client-${id}`, title: id, status: 'ACTIVE' }
+function chat(id: string, overrides: Partial<Chat> = {}): Chat {
+  return { id, client_id: `client-${id}`, title: id, status: 'ACTIVE', last_message: null, unread_count: 0, ...overrides }
 }
 
 function chatPages(pages: Chat[][]): InfiniteData<ChatPage> {
@@ -106,5 +106,55 @@ describe('moveChatToTop', () => {
   it('moves a known chat from page 2 to the top of page 1', () => {
     const result = moveChatToTop(chatPages([[chat('a'), chat('b')], [chat('c')]]), 'c')
     expect(result?.pages.map((page) => page.chats.map((c) => c.id))).toEqual([['c', 'a', 'b'], []])
+  })
+})
+
+describe('applyMessageToChats', () => {
+  const last = message('m1', '2026-10-21T10:00:00Z')
+  const list = () => chatPages([[chat('a'), chat('b', { last_message: last, unread_count: 2 })]])
+  const chatB = (data: InfiniteData<ChatPage> | undefined) => data?.pages[0].chats.find((c) => c.id === 'b')
+
+  it('returns undefined for a chat that is not loaded (a new chat: the list refetches)', () => {
+    expect(applyMessageToChats(list(), 'new', last)).toBeUndefined()
+  })
+
+  it('makes a newer client message the last one, moves the chat up and counts it unread', () => {
+    const result = applyMessageToChats(list(), 'b', message('m2', '2026-10-21T10:01:00Z'))
+    expect(result?.pages[0].chats.map((c) => c.id)).toEqual(['b', 'a'])
+    expect([chatB(result)?.last_message?.id, chatB(result)?.unread_count]).toEqual(['m2', 3])
+  })
+
+  it("doesn't count the member's own reply as unread", () => {
+    const result = applyMessageToChats(list(), 'b', message('m2', '2026-10-21T10:01:00Z', { sender_type: 'TENANT_MEMBER' }))
+    expect([chatB(result)?.last_message?.id, chatB(result)?.unread_count]).toEqual(['m2', 2])
+  })
+
+  it('counts a replayed message.created once', () => {
+    const newer = message('m2', '2026-10-21T10:01:00Z')
+    const once = applyMessageToChats(list(), 'b', newer)
+    expect(chatB(applyMessageToChats(once, 'b', newer))?.unread_count).toBe(3)
+  })
+
+  it('ignores a message older than the last one (a replayed overlap)', () => {
+    const data = list()
+    expect(applyMessageToChats(data, 'b', message('m0', '2026-10-21T09:59:00Z'))).toBe(data)
+  })
+
+  it('replaces the last message in place when only its ticks changed', () => {
+    const result = applyMessageToChats(list(), 'b', { ...last, status: 'READ' })
+    expect(result?.pages[0].chats.map((c) => c.id)).toEqual(['a', 'b'])
+    expect([chatB(result)?.last_message?.status, chatB(result)?.unread_count]).toEqual(['READ', 2])
+  })
+})
+
+describe('setUnreadCount', () => {
+  it("sets the server's count on that chat only", () => {
+    const result = setUnreadCount(chatPages([[chat('a', { unread_count: 4 }), chat('b', { unread_count: 1 })]]), 'a', 0)
+    expect(result?.pages[0].chats.map((c) => c.unread_count)).toEqual([0, 1])
+  })
+
+  it('leaves the list as it is for a chat not loaded', () => {
+    const data = chatPages([[chat('a')]])
+    expect(setUnreadCount(data, 'new', 0)).toBe(data)
   })
 })

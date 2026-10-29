@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatDayLabel, formatTime, toLocalDay } from '@/shared/lib/format-date'
+import { formatDayLabel, formatListTime, formatTime, toLocalDay } from '@/shared/lib/format-date'
 
 // Built from local times, so the expectations hold in any timezone the tests run in
 const localIso = (day: number, hours: number, minutes: number) => new Date(2026, 9, day, hours, minutes).toISOString()
@@ -43,5 +43,20 @@ describe('formatDayLabel', () => {
 
   it('treats a date slightly ahead of now as today', () => {
     expect(formatDayLabel(localIso(24, 0, 15), now)).toBe(capitalized(relative.format(0, 'day')))
+  })
+})
+
+describe('formatListTime', () => {
+  it('is the time today', () => {
+    expect(formatListTime(localIso(24, 0, 5), now)).toBe('00:05')
+  })
+
+  it('says yesterday, by calendar day', () => {
+    const yesterday = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' }).format(-1, 'day')
+    expect(formatListTime(localIso(23, 23, 50), now)).toBe(yesterday.charAt(0).toLocaleUpperCase() + yesterday.slice(1))
+  })
+
+  it('is year-month-day, two digits each, before yesterday', () => {
+    expect(formatListTime(localIso(16, 9, 0), now)).toBe('26-10-16')
   })
 })

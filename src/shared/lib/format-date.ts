@@ -41,6 +41,14 @@ export function toLocalDay(iso: string) {
   return `${date.getFullYear()}-${month}-${day}`
 }
 
+// A list's short time: "14:05" today, "Yesterday", then "26-10-16" (year-month-day, two digits each)
+export function formatListTime(iso: string, now = new Date()) {
+  const days = calendarDaysBetween(new Date(iso), now)
+  if (days <= 0) return formatTime(iso)
+  if (days === 1) return capitalize(relativeDay.format(-1, 'day'))
+  return toLocalDay(iso).slice(2)
+}
+
 // "Today", "Yesterday", or "Thursday, 16 October 2026": in the viewer's timezone and locale.
 // A date ahead of now (a clock off by minutes) counts as today
 export function formatDayLabel(iso: string, now = new Date()) {

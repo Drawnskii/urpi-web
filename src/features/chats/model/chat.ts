@@ -1,9 +1,13 @@
 // Mirrors app/modules/chat/api/schemas.py
+export type ChatStatus = 'ACTIVE' | 'HANDED_OFF' | 'CLOSED'
+
 export interface Chat {
   id: string
   client_id: string
   title: string
-  status: string
+  status: ChatStatus
+  last_message: Message | null  // newest message, any sender; null: no messages yet
+  unread_count: number          // client messages after a member last read the chat (any member)
 }
 
 export interface ChatPage {
@@ -34,6 +38,13 @@ export interface MessagePage {
 // Mirrors AddMessageIn
 export interface AddMessageInput {
   content: string
+}
+
+// Mirrors ChatReadOut: the data of chat.read (GET /events). The count as of when it was pushed,
+// so a replayed chat.read already includes client messages that came after the read
+export interface ChatReadEvent {
+  chat_id: string
+  unread_count: number
 }
 
 // Mirrors ChatEventOut: the data of message.created and message.updated (GET /events)

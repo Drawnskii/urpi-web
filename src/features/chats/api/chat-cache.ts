@@ -1,6 +1,6 @@
 import type { InfiniteData } from '@tanstack/react-query'
 
-import type { ChatPage, Message, MessagePage } from '../model/chat'
+import type { Chat, ChatPage, Message, MessagePage } from '../model/chat'
 
 // Pure cache patches for the infinite queries in chat-queries.ts: no React, no network
 
@@ -47,6 +47,49 @@ export function removeMessage(data: Messages, id: string): Messages {
     ...data,
     pages: data.pages.map((page) => ({ ...page, messages: page.messages.filter((message) => message.id !== id) })),
   }
+}
+
+function findChat(data: NonNullable<Chats>, chatId: string) {
+  return data.pages.flatMap((page) => page.chats).find((current) => current.id === chatId)
+}
+
+function patchChat(data: NonNullable<Chats>, chatId: string, patch: (chat: Chat) => Chat): NonNullable<Chats> {
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      chats: page.chats.map((current) => (current.id === chatId ? patch(current) : current)),
+    })),
+  }
+}
+
+// A pushed message on the chat list. undefined when the chat isn't loaded (a new chat, whose Chat
+// the event doesn't carry). Otherwise, by how it compares with the chat's last message:
+// - the same message (its ticks changed): replaced, nothing moves
+// - newer: it becomes the last message, the chat moves to the top, +1 unread if the client wrote it
+// - older, or already counted (the server replays an overlap after reconnecting): no change.
+//   This is what keeps a replayed message.created from counting twice
+export function applyMessageToChats(data: Chats, chatId: string, message: Message): Chats {
+  if (!data) return data
+  const chat = findChat(data, chatId)
+  if (!chat) return undefined
+
+  const last = chat.last_message
+  if (last?.id === message.id) return patchChat(data, chatId, (current) => ({ ...current, last_message: message }))
+  if (last && newestFirst(message, last) > 0) return data
+
+  const updated = patchChat(data, chatId, (current) => ({
+    ...current,
+    last_message: message,
+    unread_count: current.unread_count + (message.sender_type === 'CLIENT' ? 1 : 0),
+  }))
+  return moveChatToTop(updated, chatId)
+}
+
+// chat.read: a member read the chat; the count is the server's, as of the push
+export function setUnreadCount(data: Chats, chatId: string, unreadCount: number): Chats {
+  if (!data || !findChat(data, chatId)) return data
+  return patchChat(data, chatId, (current) => ({ ...current, unread_count: unreadCount }))
 }
 
 // The chat moves to the top of the list. undefined when the chat isn't loaded: a new chat,
