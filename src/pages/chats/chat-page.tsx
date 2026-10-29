@@ -8,9 +8,8 @@ export function ChatPage() {
   const { chatId } = route.useParams()
 
   return (
-    <>
-      <MessageList chatId={chatId} />
+    <MessageList chatId={chatId}>
       <MessageComposer chatId={chatId} />
-    </>
+    </MessageList>
   )
 }

@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router'
-import { useState, type ChangeEvent, type FormEvent } from 'react'
+import { useState, type ChangeEvent, type SubmitEvent } from 'react'
 
 import { fieldErrorsFrom, isApiError } from '@/shared/api'
 import { Button } from '@/shared/components/ui/button'
@@ -57,7 +57,7 @@ export function TemplateForm() {
     setValues((current) => ({ ...current, examples: { ...current.examples, [variable]: value } }))
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const found = checkTemplateDraft(values)
     setErrors(found)
