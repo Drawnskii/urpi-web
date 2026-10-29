@@ -9,6 +9,12 @@ export interface WhatsAppConnection {
   status: 'CONNECTING' | 'ACTIVE' // CONNECTING: a retry is still needed
 }
 
+// Mirrors WhatsAppConnectionStateOut: the data of whatsapp_connection.updated (GET /events).
+// The number now; null where GET /whatsapp/connections answers 404
+export interface WhatsAppConnectionEvent {
+  connection: WhatsAppConnection | null
+}
+
 // Mirrors ConnectWhatsAppIn: what Embedded Signup gave the browser. The tenant goes in the headers
 export interface ConnectWhatsAppAccountInput {
   code: string // FB.login's authResponse.code: single use, valid about 30 s

@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 
 import { chatLiveEvents } from '@/features/chats'
 import { templateLiveEvents } from '@/features/message-templates'
+import { whatsAppConnectionLiveEvents } from '@/features/whatsapp-connection'
 import { connectLiveEvents } from '@/shared/api'
 
 // The tenant's one live events stream, open on every page. Only the app layer knows every
@@ -15,7 +16,7 @@ export function useLiveEvents() {
     // listened may have missed a change, so refetch what was fetched before it
     return connectLiveEvents({
       path: '/events',
-      subscribers: [chatLiveEvents(queryClient), templateLiveEvents(queryClient)],
+      subscribers: [chatLiveEvents(queryClient), templateLiveEvents(queryClient), whatsAppConnectionLiveEvents(queryClient)],
       onFirstReady: () => {
         const readyAt = Date.now()
         void queryClient.invalidateQueries({

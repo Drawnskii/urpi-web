@@ -32,9 +32,17 @@ export function ConnectWhatsApp() {
   const attempt = finish.isIdle ? signup.connection : finish
   const error = attempt.error
   const isBusy = signup.isInPopup || attempt.isPending
+  // The stream shows the number CONNECTING while this tab's own connect is still running: not stuck yet
+  const isSigningUp = signup.isInPopup || signup.connection.isPending
   const isConnected = connection?.status === 'ACTIVE'
   // CONNECTING: the number is saved and Meta's setup is unfinished: retry it, don't start over
   const isConnecting = connection?.status === 'CONNECTING'
+
+  // The last attempt's result or error belongs to the number that's gone
+  function handleDisconnected() {
+    finish.reset()
+    signup.connection.reset()
+  }
 
   if (!signup.isConfigured) {
     return (
@@ -56,7 +64,7 @@ export function ConnectWhatsApp() {
           : 'Connect WhatsApp'
 
   // Meta failed a step after the number was saved: a retry finishes it, no new popup
-  const canRetry = isConnecting || (isApiError(error) && error.isBadGateway)
+  const canRetry = (isConnecting && !isSigningUp) || (isApiError(error) && error.isBadGateway)
 
   return (
     <div className="flex flex-col items-start gap-2">
@@ -84,7 +92,9 @@ export function ConnectWhatsApp() {
           {!signup.isReady && !signup.sdkError && <p className="text-body-sm text-muted-foreground">Loading Meta's signup…</p>}
           {signup.sdkError && <p role="alert" className="text-body-sm text-destructive">{signup.sdkError}</p>}
           {signup.interruption && <p className="text-body-sm text-muted-foreground">{interruptionText(signup.interruption)}</p>}
-          {isConnecting && <p>Your number {connection.phone_number} is saved, but Meta hasn't finished setting it up.</p>}
+          {isConnecting && !isSigningUp && (
+            <p>Your number {connection.phone_number} is saved, but Meta hasn't finished setting it up.</p>
+          )}
           {error && <p role="alert" className="text-body-sm text-destructive">{error.message}</p>}
         </>
       )}
@@ -97,14 +107,7 @@ export function ConnectWhatsApp() {
 
       {/* CONNECTING too: a number Meta never finished can be dropped and connected again */}
       {connection && !isBusy && (
-        <DisconnectWhatsApp
-          connection={connection}
-          // The last attempt's result or error belongs to the number that's gone
-          onDisconnected={() => {
-            finish.reset()
-            signup.connection.reset()
-          }}
-        />
+        <DisconnectWhatsApp connection={connection} onDisconnected={handleDisconnected} />
       )}
     </div>
   )
