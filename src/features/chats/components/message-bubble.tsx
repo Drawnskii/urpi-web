@@ -11,7 +11,7 @@ const STATUS_ICONS: Record<MessageStatus, { icon: LucideIcon; label: string; cla
   SENDING: { icon: ClockIcon, label: 'Sending' },
   SENT: { icon: CheckIcon, label: 'Sent' },
   DELIVERED: { icon: CheckCheckIcon, label: 'Delivered' },
-  READ: { icon: CheckCheckIcon, label: 'Read', className: 'text-primary' },
+  READ: { icon: CheckCheckIcon, label: 'Read', className: 'text-read' },
   FAILED: { icon: CircleAlertIcon, label: 'Failed', className: 'text-destructive' },
 }
 

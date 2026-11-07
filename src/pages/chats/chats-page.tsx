@@ -17,7 +17,7 @@ export function ChatsPage() {
   const streamNotice = STREAM_NOTICES[streamStatus]
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col">
+    <div className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
       {/* One h1 per page; the list and the conversation need no visible title */}
       <h1 className="sr-only">Chats</h1>
       <output className="border-b px-3 py-1 text-body-sm empty:hidden">{streamNotice}</output>
