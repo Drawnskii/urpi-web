@@ -42,6 +42,7 @@
   --sidebar-accent-foreground: oklch(0.1500 0.0200 215);
   --sidebar-border: oklch(0.8800 0.0150 215);
   --sidebar-ring: oklch(0.4200 0.0450 215);
+  --read: oklch(0.52 0.22 250);
   --font-sans: 'Work Sans Variable', ui-sans-serif, sans-serif, system-ui;
   --font-serif: 'Roboto Serif Variable', ui-serif, serif;
   --font-mono: 'Fira Mono', ui-monospace, monospace;
@@ -97,6 +98,7 @@
   --sidebar-accent-foreground: oklch(0.9800 0.0050 215);
   --sidebar-border: oklch(0.2850 0.0220 215);
   --sidebar-ring: oklch(0.4280 0.0350 215);
+  --read: oklch(0.60 0.22 250);
 }
 
 /* Type scale: text-display … text-caption set size, line height and weight together.
@@ -163,6 +165,7 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  --color-read: var(--read);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
