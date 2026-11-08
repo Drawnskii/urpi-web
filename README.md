@@ -51,6 +51,7 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running: every 
 - **Type scale:** `text-display`, `text-h1`…`text-h4`, `text-body-lg`, `text-body`, `text-body-sm`, `text-label`, `text-caption` (size, line height and weight); headings, body, labels and `small`/`time` use them by default.
 - **Logos:** `CombinationMark` (expanded sidebar) and `BrandMark` (collapsed sidebar, favicon) in `src/shared/components/brand/`, drawn in `currentColor`.
 - **Lists and tables:** items `gap-1` apart (the spacing token, 0.25rem), set for every `ul`, `ol` and `table` in `index.css`: write no `flex flex-col gap-*` on a list.
+- **Pointer:** everything clickable (buttons, icon buttons, options, menu items, tabs) shows the hand, from one rule in `index.css`; build clickable things from `<button>`.
 - **Light/dark:** the toggle at the right of the header; saved in `localStorage`, the system's until chosen, applied before the first paint.
 - Use roles, never raw colors, and give every new color a dark value. Details in the guide, section 6.
 
