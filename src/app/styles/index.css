@@ -202,6 +202,16 @@
   * {
     @apply border-border outline-ring/50;
   }
+  /* Anything clickable shows the hand, like a link: Preflight leaves buttons at the default arrow.
+     Covers icon buttons, triggers built on <button> (popover, select, sidebar) and options in lists.
+     Disabled ones keep the arrow; a cursor-* class still overrides it */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]),
+  [role="option"]:not([data-disabled]),
+  [role="menuitem"]:not([data-disabled]),
+  [role="tab"]:not([data-disabled]) {
+    cursor: pointer;
+  }
   /* Lists and tables: items gap-1 apart, Urpi's spacing rule. Lists stack as a column; a class
      still overrides any of it (grid, flex-row, hidden) */
   ul,
