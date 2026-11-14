@@ -55,6 +55,17 @@ describe('connectLiveEvents', () => {
     expect(statuses.at(-1)).toBe('ended')
   })
 
+  it('calls onEnded when the server refused the stream (signed out, or not a member)', () => {
+    const onEnded = vi.fn()
+    connectLiveEvents({ path: '/events', subscribers: [], onEnded })
+
+    FakeEventSource.last.fail(FakeEventSource.CONNECTING)              // a routine reconnection: not the end
+    expect(onEnded).not.toHaveBeenCalled()
+
+    FakeEventSource.last.fail(FakeEventSource.CLOSED)
+    expect(onEnded).toHaveBeenCalledTimes(1)
+  })
+
   it('reports reconnecting only when a reconnection takes longer than usual', () => {
     connectLiveEvents({ path: '/events', subscribers: [] })
     FakeEventSource.last.fail(FakeEventSource.CONNECTING)
