@@ -4,7 +4,7 @@ import { messageTemplateQueries } from '@/features/message-templates'
 import { TemplatesPage } from '@/pages/templates/templates-page'
 import { TemplatesPageSkeleton } from '@/pages/templates/templates-page-skeleton'
 
-export const Route = createFileRoute('/templates')({
+export const Route = createFileRoute('/_app/templates')({
   loader: ({ context }) => context.queryClient.ensureQueryData(messageTemplateQueries.list()),
   pendingComponent: TemplatesPageSkeleton,
   component: TemplatesPage,

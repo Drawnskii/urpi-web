@@ -7,13 +7,29 @@ import type { WhatsAppConnection } from '../model/whatsapp-connection'
 
 interface DisconnectWhatsAppProps {
   connection: WhatsAppConnection
+  // false: shown disabled, with why. A member told to "just disconnect it" would otherwise look for a
+  // button that isn't there. The backend's 403 is the real protection
+  isAllowed: boolean
   onDisconnected: () => void
 }
 
 // Two clicks: disconnecting stops every chat on the number at once
-export function DisconnectWhatsApp({ connection, onDisconnected }: DisconnectWhatsAppProps) {
+export function DisconnectWhatsApp({ connection, isAllowed, onDisconnected }: DisconnectWhatsAppProps) {
   const disconnect = useDisconnectWhatsAppAccount()
   const [isConfirming, setIsConfirming] = useState(false)
+
+  if (!isAllowed) {
+    return (
+      <div className="flex flex-col items-start gap-1">
+        <Button type="button" variant="outline" disabled aria-describedby="disconnect-owner-only">
+          Disconnect
+        </Button>
+        <p id="disconnect-owner-only" className="text-body-sm text-muted-foreground">
+          Only the owner can disconnect the number.
+        </p>
+      </div>
+    )
+  }
 
   if (!isConfirming) {
     return (

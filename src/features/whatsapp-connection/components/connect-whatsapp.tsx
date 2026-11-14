@@ -21,7 +21,12 @@ function interruptionText(interruption: Exclude<SignupInterruption, { kind: 'fai
     : "Signup was closed. Start again whenever you're ready."
 }
 
-export function ConnectWhatsApp() {
+interface ConnectWhatsAppProps {
+  // Only the business's owner disconnects (the backend answers 403 to anyone else)
+  canDisconnect: boolean
+}
+
+export function ConnectWhatsApp({ canDisconnect }: ConnectWhatsAppProps) {
   const signup = useEmbeddedSignup()
   const finish = useFinishWhatsAppConnection()
   // The tenant's number, from the backend; connect and retry write their result here too.
@@ -129,7 +134,7 @@ export function ConnectWhatsApp() {
 
       {/* CONNECTING too: a number Meta never finished can be dropped and connected again */}
       {connection && !isBusy && (
-        <DisconnectWhatsApp connection={connection} onDisconnected={handleDisconnected} />
+        <DisconnectWhatsApp connection={connection} isAllowed={canDisconnect} onDisconnected={handleDisconnected} />
       )}
     </div>
   )

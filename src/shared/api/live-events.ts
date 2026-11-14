@@ -6,7 +6,7 @@ import { streamUrl } from './http-client'
 // their own event names; this file knows none of them
 
 // connecting: opening. live: normal. reconnecting: no stream for a while (the browser retries).
-// ended: the server refused the stream (not a member anymore); the browser won't retry
+// ended: the server refused the stream (signed out, or not a member anymore); the browser won't retry
 export type LiveEventsStatus = 'connecting' | 'live' | 'reconnecting' | 'ended'
 
 export const useLiveEventsStore = create<{ status: LiveEventsStatus }>(() => ({ status: 'connecting' }))
@@ -29,11 +29,13 @@ export interface LiveEventsSubscriber {
 const RECONNECTING_NOTICE_MS = 8000
 
 // Opens the stream and hands each event to its subscriber. Returns the close function.
-// onFirstReady: the stream is listening for the first time (data loaded before it may be stale)
+// onFirstReady: the stream is listening for the first time (data loaded before it may be stale).
+// onEnded: the server refused the stream for good (the session ended, or no longer a member)
 export function connectLiveEvents(options: {
   path: string
   subscribers: LiveEventsSubscriber[]
   onFirstReady?: () => void
+  onEnded?: () => void
 }) {
   const source = new EventSource(streamUrl(options.path))
   let hasSeenReady = false
@@ -60,8 +62,9 @@ export function connectLiveEvents(options: {
   source.onerror = () => {
     clearTimeout(reconnectingNotice)
     if (source.readyState === EventSource.CLOSED) {
-      // The server refused the stream (404: not a member anymore). The browser won't retry
+      // The server refused the stream (401: signed out; 404: not a member anymore). The browser won't retry
       setStatus('ended')
+      options.onEnded?.()
       return
     }
     // CONNECTING: a dropped connection or the stream's planned expiry. The browser retries by

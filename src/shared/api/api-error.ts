@@ -23,6 +23,11 @@ export class ApiError extends Error {
     this.issues = Array.isArray(detail) ? (detail as ValidationIssue[]) : []
   }
 
+  // No session, or it ended: sign in again
+  get isUnauthorized() {
+    return this.status === 401
+  }
+
   get isNotFound() {
     return this.status === 404
   }

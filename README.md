@@ -8,16 +8,15 @@ Built on the Vite `react-ts` template, with a feature-driven folder structure, T
 
 ```bash
 pnpm install
-cp .env.example .env     # set VITE_TENANT_ID, VITE_TENANT_MEMBER_ID (a member of that tenant) and Meta's app ids
+cp .env.example .env     # set Meta's app ids
 pnpm dev                 # http://localhost:5173
 ```
 
-The backend (`uvicorn app.main:app --reload`, port 8000) must be running: every page uses it. The dev server proxies `/api/*` to it.
+The backend (`uvicorn app.main:app --reload`, port 8000) must be running, with its WorkOS settings: every page but `/signed-out` needs a session, and signing in is the backend's route. The dev server proxies `/api/*` to it, so the session cookie is same-origin.
 
 | Variable | Purpose |
 | --- | --- |
 | `VITE_API_URL` | Base URL of the API (`/api` in dev, through the proxy) |
-| `VITE_TENANT_ID`, `VITE_TENANT_MEMBER_ID` | Sent as `X-Tenant-ID` / `X-Tenant-Member-ID` (and in the stream's URL) until authentication exists |
 | `VITE_WHATSAPP_APP_ID`, `VITE_WHATSAPP_EMBEDDED_SIGNUP_CONFIG_ID` | Meta's app and Embedded Signup configuration, for "Connect WhatsApp". Public, never the app secret |
 | `VITE_WHATSAPP_GRAPH_API_VERSION` | Graph API version for Meta's SDK (default `v25.0`) |
 | `API_PROXY_TARGET` | Dev server only: where `/api` goes (default `http://localhost:8000`) |
@@ -38,10 +37,12 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running: every 
 
 | Route | Feature | What it does |
 | --- | --- | --- |
-| every page | | App shell: a sidebar with the three sections (a sheet on phones) |
+| every page but `/signed-out` | `auth`, `tenants` | Signed in through the backend (WorkOS), or sent to sign in and back. App shell: a sidebar with the business picker, the three sections and the user menu (log out); a sheet on phones |
+| `/signed-out` | | Public: logged out, or signing in failed, with a button to sign in |
+| `/onboarding` | `tenants` | Create the first business (or another one); the user becomes its owner |
 | `/` | | Home: links to chats, WhatsApp number and templates |
 | `/chats`, `/chats/$chatId` | `chats` | Inbox (each chat named by a member's title, else the client's WhatsApp name, else "Untitled chat", renamed inline with the pencil; the client's name and number in an info popover; last message, its time and an unread badge per chat, live) and one chat: live messages as bubbles with delivery ticks (long words wrap), grouped by day under a sticky date, optimistic replies, read receipts, typing indicator |
-| `/whatsapp` | `whatsapp-connection` | Connect the tenant's number through Meta's Embedded Signup; Disconnect it, live from any tab or by Meta |
+| `/whatsapp` | `whatsapp-connection` | Connect the business's number through Meta's Embedded Signup; Disconnect it (the owner only), live from any tab or by Meta |
 | `/templates` | `message-templates` | Create message templates and follow Meta's review and re-categorizations |
 
 ## Brand and theme
@@ -66,9 +67,10 @@ src/
     router.ts          router instance, type registration
     query-client.ts    QueryClient defaults
     providers.tsx      QueryClientProvider, TooltipProvider
-    http.ts            default request headers and stream params (tenant, member)
+    session.ts         the route guard: signed in, a business chosen; sign in again on a 401
+    http.ts            X-Tenant-ID (the current business) on requests and streams, 401 → sign in
     live-events.ts     the app's one live events stream, with each feature's handlers
-    layout/            the app shell: sidebar (with the logo), header with the theme toggle, page area
+    layout/            the signed-in layout and the shell: sidebar (logo, business picker, sections, user menu), header with the theme toggle, page area
     route-tree.gen.ts  generated, do not edit
   pages/               route-level screens; compose features, little logic
   features/            one folder per business feature, public API in index.ts

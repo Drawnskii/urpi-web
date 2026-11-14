@@ -9,131 +9,214 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ChatsRouteImport } from './routes/chats'
-import { Route as TemplatesRouteImport } from './routes/templates'
-import { Route as WhatsappRouteImport } from './routes/whatsapp'
-import { Route as ChatsChatIdRouteImport } from './routes/chats.$chatId'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as SignedOutRouteImport } from './routes/signed-out'
+import { Route as AppIndexRouteImport } from './routes/_app.index'
+import { Route as AppChatsRouteImport } from './routes/_app.chats'
+import { Route as AppOnboardingRouteImport } from './routes/_app.onboarding'
+import { Route as AppTemplatesRouteImport } from './routes/_app.templates'
+import { Route as AppWhatsappRouteImport } from './routes/_app.whatsapp'
+import { Route as AppChatsChatIdRouteImport } from './routes/_app.chats.$chatId'
 
-const IndexRoute = IndexRouteImport.update({
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignedOutRoute = SignedOutRouteImport.update({
+  id: '/signed-out',
+  path: '/signed-out',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const ChatsRoute = ChatsRouteImport.update({
+const AppChatsRoute = AppChatsRouteImport.update({
   id: '/chats',
   path: '/chats',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const TemplatesRoute = TemplatesRouteImport.update({
+const AppOnboardingRoute = AppOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTemplatesRoute = AppTemplatesRouteImport.update({
   id: '/templates',
   path: '/templates',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const WhatsappRoute = WhatsappRouteImport.update({
+const AppWhatsappRoute = AppWhatsappRouteImport.update({
   id: '/whatsapp',
   path: '/whatsapp',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
 } as any)
-const ChatsChatIdRoute = ChatsChatIdRouteImport.update({
+const AppChatsChatIdRoute = AppChatsChatIdRouteImport.update({
   id: '/$chatId',
   path: '/$chatId',
-  getParentRoute: () => ChatsRoute,
+  getParentRoute: () => AppChatsRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/chats': typeof ChatsRouteWithChildren
-  '/templates': typeof TemplatesRoute
-  '/whatsapp': typeof WhatsappRoute
-  '/chats/$chatId': typeof ChatsChatIdRoute
+  '/': typeof AppIndexRoute
+  '/signed-out': typeof SignedOutRoute
+  '/chats': typeof AppChatsRouteWithChildren
+  '/onboarding': typeof AppOnboardingRoute
+  '/templates': typeof AppTemplatesRoute
+  '/whatsapp': typeof AppWhatsappRoute
+  '/chats/$chatId': typeof AppChatsChatIdRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/chats': typeof ChatsRouteWithChildren
-  '/templates': typeof TemplatesRoute
-  '/whatsapp': typeof WhatsappRoute
-  '/chats/$chatId': typeof ChatsChatIdRoute
+  '/signed-out': typeof SignedOutRoute
+  '/chats': typeof AppChatsRouteWithChildren
+  '/onboarding': typeof AppOnboardingRoute
+  '/templates': typeof AppTemplatesRoute
+  '/whatsapp': typeof AppWhatsappRoute
+  '/': typeof AppIndexRoute
+  '/chats/$chatId': typeof AppChatsChatIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/chats': typeof ChatsRouteWithChildren
-  '/templates': typeof TemplatesRoute
-  '/whatsapp': typeof WhatsappRoute
-  '/chats/$chatId': typeof ChatsChatIdRoute
+  '/_app': typeof AppRouteWithChildren
+  '/signed-out': typeof SignedOutRoute
+  '/_app/chats': typeof AppChatsRouteWithChildren
+  '/_app/onboarding': typeof AppOnboardingRoute
+  '/_app/templates': typeof AppTemplatesRoute
+  '/_app/whatsapp': typeof AppWhatsappRoute
+  '/_app/': typeof AppIndexRoute
+  '/_app/chats/$chatId': typeof AppChatsChatIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chats' | '/templates' | '/whatsapp' | '/chats/$chatId'
+  fullPaths:
+    | '/'
+    | '/signed-out'
+    | '/chats'
+    | '/onboarding'
+    | '/templates'
+    | '/whatsapp'
+    | '/chats/$chatId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chats' | '/templates' | '/whatsapp' | '/chats/$chatId'
+  to:
+    | '/signed-out'
+    | '/chats'
+    | '/onboarding'
+    | '/templates'
+    | '/whatsapp'
+    | '/'
+    | '/chats/$chatId'
   id:
-    '__root__' | '/' | '/chats' | '/templates' | '/whatsapp' | '/chats/$chatId'
+    | '__root__'
+    | '/_app'
+    | '/signed-out'
+    | '/_app/chats'
+    | '/_app/onboarding'
+    | '/_app/templates'
+    | '/_app/whatsapp'
+    | '/_app/'
+    | '/_app/chats/$chatId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ChatsRoute: typeof ChatsRouteWithChildren
-  TemplatesRoute: typeof TemplatesRoute
-  WhatsappRoute: typeof WhatsappRoute
+  AppRoute: typeof AppRouteWithChildren
+  SignedOutRoute: typeof SignedOutRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signed-out': {
+      id: '/signed-out'
+      path: '/signed-out'
+      fullPath: '/signed-out'
+      preLoaderRoute: typeof SignedOutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/chats': {
-      id: '/chats'
+    '/_app/chats': {
+      id: '/_app/chats'
       path: '/chats'
       fullPath: '/chats'
-      preLoaderRoute: typeof ChatsRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppChatsRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/templates': {
-      id: '/templates'
+    '/_app/onboarding': {
+      id: '/_app/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof AppOnboardingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/templates': {
+      id: '/_app/templates'
       path: '/templates'
       fullPath: '/templates'
-      preLoaderRoute: typeof TemplatesRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppTemplatesRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/whatsapp': {
-      id: '/whatsapp'
+    '/_app/whatsapp': {
+      id: '/_app/whatsapp'
       path: '/whatsapp'
       fullPath: '/whatsapp'
-      preLoaderRoute: typeof WhatsappRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppWhatsappRouteImport
+      parentRoute: typeof AppRoute
     }
-    '/chats/$chatId': {
-      id: '/chats/$chatId'
+    '/_app/chats/$chatId': {
+      id: '/_app/chats/$chatId'
       path: '/$chatId'
       fullPath: '/chats/$chatId'
-      preLoaderRoute: typeof ChatsChatIdRouteImport
-      parentRoute: typeof ChatsRoute
+      preLoaderRoute: typeof AppChatsChatIdRouteImport
+      parentRoute: typeof AppChatsRoute
     }
   }
 }
 
-interface ChatsRouteChildren {
-  ChatsChatIdRoute: typeof ChatsChatIdRoute
+interface AppChatsRouteChildren {
+  AppChatsChatIdRoute: typeof AppChatsChatIdRoute
 }
 
-const ChatsRouteChildren: ChatsRouteChildren = {
-  ChatsChatIdRoute: ChatsChatIdRoute,
+const AppChatsRouteChildren: AppChatsRouteChildren = {
+  AppChatsChatIdRoute: AppChatsChatIdRoute,
 }
 
-const ChatsRouteWithChildren = ChatsRoute._addFileChildren(ChatsRouteChildren)
+const AppChatsRouteWithChildren = AppChatsRoute._addFileChildren(
+  AppChatsRouteChildren,
+)
+
+interface AppRouteChildren {
+  AppChatsRoute: typeof AppChatsRouteWithChildren
+  AppOnboardingRoute: typeof AppOnboardingRoute
+  AppTemplatesRoute: typeof AppTemplatesRoute
+  AppWhatsappRoute: typeof AppWhatsappRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppChatsRoute: AppChatsRouteWithChildren,
+  AppOnboardingRoute: AppOnboardingRoute,
+  AppTemplatesRoute: AppTemplatesRoute,
+  AppWhatsappRoute: AppWhatsappRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  ChatsRoute: ChatsRouteWithChildren,
-  TemplatesRoute: TemplatesRoute,
-  WhatsappRoute: WhatsappRoute,
+  AppRoute: AppRouteWithChildren,
+  SignedOutRoute: SignedOutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

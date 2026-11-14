@@ -3,25 +3,20 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { createRootRouteWithContext, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-import { AppShell } from '@/app/layout/app-shell'
-import { useLiveEvents } from '@/app/live-events'
-
 export interface RouterContext {
   queryClient: QueryClient
 }
 
+// Public pages (/signed-out) render here directly; every other page sits in the _app layout,
+// which requires a session and wraps it in the shell
 export const Route = createRootRouteWithContext<RouterContext>()({
   component: RootComponent,
 })
 
 function RootComponent() {
-  useLiveEvents() // one stream per tab, whichever page is open
-
   return (
     <>
-      <AppShell>
-        <Outlet />
-      </AppShell>
+      <Outlet />
       {import.meta.env.DEV && (
         <>
           <TanStackRouterDevtools position="bottom-right" />

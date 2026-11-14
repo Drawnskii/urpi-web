@@ -4,7 +4,7 @@ import { chatQueries } from '@/features/chats'
 import { ChatPage } from '@/pages/chats/chat-page'
 import { ChatPageSkeleton } from '@/pages/chats/chat-page-skeleton'
 
-export const Route = createFileRoute('/chats/$chatId')({
+export const Route = createFileRoute('/_app/chats/$chatId')({
   loader: ({ context, params }) => context.queryClient.ensureInfiniteQueryData(chatQueries.messages(params.chatId)),
   pendingComponent: ChatPageSkeleton,
   component: ChatPage,
