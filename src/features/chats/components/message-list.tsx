@@ -7,7 +7,7 @@ import { formatDayLabel } from '@/shared/lib'
 
 import { chatQueries } from '../api/chat-queries'
 import { useReadReceipts } from '../hooks/use-read-receipts'
-import { groupMessagesByDay } from '../model/message-groups'
+import { groupMessagesByDay, groupMessagesBySide } from '../model/message-groups'
 import { MessageBubble } from './message-bubble'
 
 interface MessageListProps {
@@ -38,9 +38,10 @@ export function MessageList({ chatId, children }: MessageListProps) {
     // list fills the space and the footer sits at the bottom even with few messages
     <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:flex! [&_[data-slot=scroll-area-viewport]>div]:min-h-full [&_[data-slot=scroll-area-viewport]>div]:flex-col">
       {messages.length === 0 && <p className="flex-1 p-4 text-muted-foreground">No messages yet</p>}
-      <ol className="flex-1 p-4 empty:hidden">
+      <ol className="flex-1 px-4 pb-4 pt-2 empty:hidden">
         {days.map((group) => (
-          <li key={group.day} className="flex flex-col gap-1 not-first:pt-2">
+          // gap-3 under the badge: the first message sits as far from it as a new turn does
+          <li key={group.day} className="flex flex-col gap-3 not-first:pt-2">
             {/* Sticky inside its own day: it stays pinned while that day is on screen and scrolls
                 away with the day's end, so the pill always names the day being read. CSS only */}
             <div className="sticky top-2 z-10 flex justify-center">
@@ -48,9 +49,16 @@ export function MessageList({ chatId, children }: MessageListProps) {
                 <time dateTime={group.day}>{formatDayLabel(group.messages[0].created_at)}</time>
               </Badge>
             </div>
-            <ol>
-              {group.messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
+            {/* One run per turn: runs further apart than the list's gap-1, a run's bubbles gap-1 apart */}
+            <ol className="gap-3">
+              {groupMessagesBySide(group.messages).map((run) => (
+                <li key={run.messages[0].id}>
+                  <ol>
+                    {run.messages.map((message, index) => (
+                      <MessageBubble key={message.id} message={message} isContinued={index > 0} />
+                    ))}
+                  </ol>
+                </li>
               ))}
             </ol>
           </li>

@@ -41,7 +41,7 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running, with i
 | `/signed-out` | | Public: logged out, or signing in failed, with a button to sign in |
 | `/onboarding` | `tenants` | Create the first business (or another one); the user becomes its owner |
 | `/` | | Home: links to chats, WhatsApp number and templates |
-| `/chats`, `/chats/$chatId` | `chats` | Inbox (each chat named by a member's title, else the client's WhatsApp name, else "Untitled chat", renamed inline with the pencil; the client's name and number in an info popover; last message, its time and an unread badge per chat, live) and one chat: live messages as bubbles with delivery ticks (long words wrap), grouped by day under a sticky date, optimistic replies, read receipts, typing indicator |
+| `/chats`, `/chats/$chatId` | `chats` | Inbox (each chat named by a member's title, else the client's WhatsApp name, else "Untitled chat", renamed inline with the pencil; the client's name and number in an info popover; last message, its time and an unread badge per chat, live) and one chat: live messages as bubbles with delivery ticks (long words wrap), grouped by day under a sticky date and by turn (a run of one side's bubbles chained, runs further apart), optimistic replies, read receipts, typing indicator |
 | `/whatsapp` | `whatsapp-connection` | Connect the business's number through Meta's Embedded Signup; Disconnect it (the owner only), live from any tab or by Meta |
 | `/templates` | `message-templates` | Create message templates and follow Meta's review and re-categorizations |
 
@@ -51,7 +51,7 @@ The backend (`uvicorn app.main:app --reload`, port 8000) must be running, with i
 - **Fonts:** Roboto Serif for body text (the default), Work Sans for titles, headings and the sidebar, Fira Mono for labels, badges and small text; from Fontsource, bundled with the app (no Google Fonts request).
 - **Type scale:** `text-display`, `text-h1`…`text-h4`, `text-body-lg`, `text-body`, `text-body-sm`, `text-label`, `text-caption` (size, line height and weight); headings, body, labels and `small`/`time` use them by default.
 - **Logos:** `HorizontalCombinationMark` (sidebar), `CombinationMark` (stacked, for roomy spaces) and `BrandMark` (favicon) in `src/shared/components/brand/`, drawn in `currentColor`.
-- **Lists and tables:** items `gap-1` apart (the spacing token, 0.25rem), set for every `ul`, `ol` and `table` in `index.css`: write no `flex flex-col gap-*` on a list.
+- **Lists and tables:** items `gap-1` apart (the spacing token, 0.25rem), set for every `ul`, `ol` and `table` in `index.css`: write no `flex flex-col gap-*` on a list. The one exception: a chat's turns, `gap-3` apart (`message-list.tsx`).
 - **Pointer:** everything clickable (buttons, icon buttons, options, menu items, tabs) shows the hand, from one rule in `index.css`; build clickable things from `<button>`.
 - **Light/dark:** the toggle at the right of the header; saved in `localStorage`, the system's until chosen, applied before the first paint.
 - Use roles, never raw colors, and give every new color a dark value. Details in the guide, section 6.
