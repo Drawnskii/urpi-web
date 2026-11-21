@@ -7,8 +7,12 @@ import { formatDayLabel } from '@/shared/lib'
 
 import { chatQueries } from '../api/chat-queries'
 import { useReadReceipts } from '../hooks/use-read-receipts'
+import { useRespondingLabel } from '../hooks/use-responding-label'
+import { useTeam } from '../hooks/use-team'
+import { authorFullName, messageAuthor, sameAuthor } from '../model/message-author'
 import { groupMessagesByDay, groupMessagesBySide } from '../model/message-groups'
 import { MessageBubble } from './message-bubble'
+import { RespondingBubble } from './responding-bubble'
 
 interface MessageListProps {
   chatId: string
@@ -27,11 +31,14 @@ export function MessageList({ chatId, children }: MessageListProps) {
   const messages = data.pages.flatMap((page) => page.messages).reverse()
   const days = groupMessagesByDay(messages)
   const lastMessageId = messages.at(-1)?.id
+  const team = useTeam()
+  const isResponding = useRespondingLabel(chatId) !== null
 
-  // Keep the newest message in view when the chat opens or a message arrives
+  // Keep the newest message in view when the chat opens, a message arrives or someone starts
+  // writing a reply
   useEffect(() => {
-    if (lastMessageId) bottomRef.current?.scrollIntoView({ block: 'end' })
-  }, [lastMessageId])
+    if (lastMessageId || isResponding) bottomRef.current?.scrollIntoView({ block: 'end' })
+  }, [lastMessageId, isResponding])
 
   return (
     // Radix wraps the content in a display: table div; as a full-height flex column instead, the
@@ -54,9 +61,15 @@ export function MessageList({ chatId, children }: MessageListProps) {
               {groupMessagesBySide(group.messages).map((run) => (
                 <li key={run.messages[0].id}>
                   <ol>
-                    {run.messages.map((message, index) => (
-                      <MessageBubble key={message.id} message={message} isContinued={index > 0} />
-                    ))}
+                    {run.messages.map((message, index) => {
+                      // Who wrote it, under the last of each author's messages in a row
+                      const next = run.messages[index + 1]
+                      const isAuthorsLast = !next || !sameAuthor(message, next)
+                      const author = isAuthorsLast ? authorFullName(messageAuthor(message, team)) : null
+                      return (
+                        <MessageBubble key={message.id} message={message} isContinued={index > 0} author={author} />
+                      )
+                    })}
                   </ol>
                 </li>
               ))}
@@ -64,6 +77,7 @@ export function MessageList({ chatId, children }: MessageListProps) {
           </li>
         ))}
       </ol>
+      <RespondingBubble chatId={chatId} />
       {/* Sticky at the bottom, so messages pass under the composer's card; the space around the card
           is transparent and lets clicks through. Part of the scrolled content, so the newest
           message rests just above it */}

@@ -7,6 +7,7 @@ function message(id: string, day: number, hours: number, sender_type: SenderType
   return {
     id,
     sender_type,
+    sender_tenant_member_id: null,
     content: id,
     status: null,
     failure_reason: null,

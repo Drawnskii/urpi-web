@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 
+import { useCurrentTenant } from '@/features/tenants'
+
 import type { AddMessageInput, Chat, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
 import { chatApi } from './chat-api'
 import { removeMessage, replaceChat, setChatTitle, upsertMessage } from './chat-cache'
@@ -10,6 +12,8 @@ import { chatKeys } from './chat-queries'
 export function useAddMessage(chatId: string) {
   const queryClient = useQueryClient()
   const queryKey = chatKeys.messages(chatId)
+  // The optimistic message's author: the signed-in member, so it carries no name, like the saved one
+  const memberId = useCurrentTenant()?.member_id ?? null
 
   return useMutation({
     mutationFn: (input: AddMessageInput) => chatApi.addMessage(chatId, input),
@@ -18,6 +22,7 @@ export function useAddMessage(chatId: string) {
       const optimistic: Message = {
         id: `temp-${crypto.randomUUID()}`,
         sender_type: 'TENANT_MEMBER',
+        sender_tenant_member_id: memberId,
         content: input.content,
         status: 'PENDING',
         failure_reason: null,

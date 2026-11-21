@@ -19,10 +19,13 @@ interface MessageBubbleProps {
   message: Message
   // Follows a message from the same side: the corner it touches is squared too, chaining the run
   isContinued?: boolean
+  // Under the bubble, outside it (a short message's bubble has no room): "Ana García", "Urpi".
+  // Only on the last of an author's messages, never on the signed-in member's
+  author?: string | null
 }
 
 // One message: client messages on the left, the agent's and members' on the right
-export function MessageBubble({ message, isContinued = false }: MessageBubbleProps) {
+export function MessageBubble({ message, isContinued = false, author = null }: MessageBubbleProps) {
   const isClient = message.sender_type === 'CLIENT'
   // Client messages have no status (they're incoming)
   const status = message.status ? STATUS_ICONS[message.status] : null
@@ -58,6 +61,7 @@ export function MessageBubble({ message, isContinued = false }: MessageBubblePro
           {message.failure_reason}
         </p>
       )}
+      {author && <span className="px-1 text-caption text-muted-foreground">{author}</span>}
     </li>
   )
 }

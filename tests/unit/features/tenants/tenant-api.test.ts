@@ -25,6 +25,14 @@ describe('tenantApi', () => {
     expect(fetchMock.mock.calls[0][0]).toMatch(/\/tenants$/)
   })
 
+  it('lists the current business’s members with GET /members', async () => {
+    const ana = { member_id: 'member-1', first_name: 'Ana', last_name: null }
+    fetchMock.mockResolvedValueOnce(new Response(JSON.stringify([ana]), { status: 200 }))
+
+    expect(await tenantApi.members()).toEqual([ana])
+    expect(fetchMock.mock.calls[0][0]).toMatch(/\/members$/)
+  })
+
   it('adds a business with its name and time zone, never an owner', async () => {
     expect(await tenantApi.add({ name: 'Pizza', timezone: 'America/Guayaquil' })).toEqual(PIZZA)
 

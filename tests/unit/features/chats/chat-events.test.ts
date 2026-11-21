@@ -2,10 +2,12 @@ import { QueryClient } from '@tanstack/react-query'
 import { describe, expect, it, vi } from 'vitest'
 
 import { chatLiveEvents } from '@/features/chats/api/chat-events'
+import { getChatWriters } from '@/features/chats/model/typing-store'
 
 const message = {
   id: 'm2',
   sender_type: 'CLIENT',
+  sender_tenant_member_id: null as string | null,
   content: 'hola',
   status: null,
   failure_reason: null,
@@ -121,6 +123,38 @@ describe('chatLiveEvents', () => {
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'list'] })
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'messages'] })
+  })
+
+  it('shows who is writing until they stop, and their reply ends it too', () => {
+    const queryClient = seededClient()
+    const { events } = chatLiveEvents(queryClient)
+
+    events['chat.typing']({ chat_id: 'c2', member_id: 'ana', expires_in_seconds: 25 })
+    events['chat.typing']({ chat_id: 'c2', member_id: null, expires_in_seconds: 60 })
+    expect(getChatWriters('c2').map((writer) => writer.memberId)).toEqual(['ana', null])
+
+    events['chat.typing_stopped']({ chat_id: 'c2', member_id: null, expires_in_seconds: 0 })
+    events['message.created']({
+      chat_id: 'c2',
+      message: { ...message, sender_type: 'TENANT_MEMBER', sender_tenant_member_id: 'ana', status: 'PENDING' },
+    })
+    expect(getChatWriters('c2')).toEqual([])
+  })
+
+  it('refetches the team for a reply from a teammate it doesn’t know yet', () => {
+    const queryClient = seededClient()
+    queryClient.setQueryData(['tenants', 'members'], [{ member_id: 'ana', first_name: 'Ana', last_name: null }])
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
+    const reply = (memberId: string) => ({
+      chat_id: 'c2',
+      message: { ...message, id: memberId, sender_type: 'TENANT_MEMBER', sender_tenant_member_id: memberId, status: 'PENDING' },
+    })
+
+    chatLiveEvents(queryClient).events['message.created'](reply('ana'))
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: ['tenants', 'members'] })
+
+    chatLiveEvents(queryClient).events['message.created'](reply('new'))
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['tenants', 'members'] })
   })
 
   it('needs nothing on reconnect: the server replays the messages', () => {

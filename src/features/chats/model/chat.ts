@@ -48,6 +48,7 @@ export type MessageStatus = 'PENDING' | 'SENDING' | 'SENT' | 'DELIVERED' | 'READ
 export interface Message {
   id: string
   sender_type: SenderType
+  sender_tenant_member_id: string | null  // TENANT_MEMBER: who wrote it; null on the others, and once the member is deleted
   content: string
   status: MessageStatus | null   // null on client messages
   failure_reason: string | null  // FAILED only
@@ -83,3 +84,10 @@ export interface ChatEvent {
   message: Message
 }
 
+// Mirrors ChatTypingOut: the data of chat.typing and chat.typing_stopped (GET /events). Live only:
+// never replayed after a reconnection. The client's typing never reaches us (WhatsApp doesn't send it)
+export interface ChatTypingEvent {
+  chat_id: string
+  member_id: string | null    // the teammate writing; null: the agent
+  expires_in_seconds: number  // hide it after this unless renewed; 0 on chat.typing_stopped
+}

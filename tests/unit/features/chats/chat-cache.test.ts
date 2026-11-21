@@ -16,6 +16,7 @@ function message(id: string, createdAt: string, overrides: Partial<Message> = {}
   return {
     id,
     sender_type: 'CLIENT',
+    sender_tenant_member_id: null,
     content: id,
     status: null,
     failure_reason: null,

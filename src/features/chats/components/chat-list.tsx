@@ -7,9 +7,9 @@ import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
 import { ScrollArea } from '@/shared/components/ui/scroll-area'
 import { formatDateTime, formatListTime } from '@/shared/lib'
-import { cn } from '@/shared/lib/utils'
 
 import { chatQueries } from '../api/chat-queries'
+import { ChatPreview } from './chat-preview'
 import { ChatTitle } from './chat-title'
 import { ClientInfoPopover } from './client-info-popover'
 
@@ -75,16 +75,9 @@ export function ChatList() {
                         </span>
                       </span>
                     </span>
-                    {/* The last message, and how many of the client's are unread: unread previews stand out */}
+                    {/* The last message or who is responding, and how many of the client's are unread */}
                     <span className="mt-0.5 flex items-center gap-2">
-                      <span
-                        className={cn(
-                          'min-w-0 flex-1 truncate text-body-sm',
-                          unread > 0 ? 'text-foreground' : 'text-muted-foreground',
-                        )}
-                      >
-                        {last ? last.content : 'No messages yet'}
-                      </span>
+                      <ChatPreview chat={chat} />
                       {/* Only what's not the usual state: handed off or closed */}
                       {chat.status !== 'ACTIVE' && <Badge variant="outline">{chat.status}</Badge>}
                       {unread > 0 && (

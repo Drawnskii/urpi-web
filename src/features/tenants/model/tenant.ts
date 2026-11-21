@@ -12,6 +12,14 @@ export interface UserTenant {
   role: TenantMemberRole
 }
 
+// Mirrors TenantMemberOut (GET /members): a teammate, named for who wrote a reply or is writing one.
+// Names only, never the email; WorkOS doesn't require either part
+export interface TenantMember {
+  member_id: string
+  first_name: string | null
+  last_name: string | null
+}
+
 // Mirrors AddTenantIn. The owner comes from the session, never the body
 export interface AddTenantInput {
   name: string
@@ -29,6 +37,16 @@ const ROLE_LABELS: Record<TenantMemberRole, string> = { OWNER: 'Owner', MEMBER: 
 
 export function roleLabel(role: TenantMemberRole) {
   return ROLE_LABELS[role]
+}
+
+// "Ana García": the parts they have; null without a name
+export function memberFullName(member: TenantMember) {
+  return [member.first_name, member.last_name].filter(Boolean).join(' ') || null
+}
+
+// "Ana", for short labels ("Ana: …", "Ana is responding"); the last name if that's all there is
+export function memberShortName(member: TenantMember) {
+  return member.first_name || member.last_name || null
 }
 
 // One letter standing in for the business's logo (businesses have none yet)
