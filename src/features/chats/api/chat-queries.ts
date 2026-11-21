@@ -1,5 +1,6 @@
 import { infiniteQueryOptions, queryOptions, useSuspenseInfiniteQuery } from '@tanstack/react-query'
 
+import { linkStaleTime } from '../model/message-media'
 import { chatApi } from './chat-api'
 
 // chat-events.ts patches the cache by these keys: change both together
@@ -11,6 +12,8 @@ export const chatKeys = {
   clientChats: (clientId: string) => [...chatKeys.allClientChats(), clientId] as const,
   allMessages: () => [...chatKeys.all, 'messages'] as const,
   messages: (chatId: string) => [...chatKeys.allMessages(), chatId] as const,
+  // Outside allMessages(): a resync never refetches a link, so a playing file's source never changes
+  mediaLink: (chatId: string, messageId: string) => [...chatKeys.all, 'media', chatId, messageId] as const,
 }
 
 type ChatCursor = { id: string; updatedAt: string }
@@ -18,6 +21,9 @@ type MessageCursor = { id: string; createdAt: string }
 
 // The backend's MAX_CHAT_PAGE_SIZE: one page holds a client's chats, past ones included
 const CLIENT_CHATS_LIMIT = 100
+
+// An unused link leaves the cache well before it expires (the backend's MEDIA_LINK_SECONDS: 600)
+const MEDIA_LINK_GC_MS = 5 * 60_000
 
 export const chatQueries = {
   // The inbox: one row per client, its newest chat (closed ones are reached from the chat)
@@ -60,6 +66,15 @@ export const chatQueries = {
         lastPage.next_before_id && lastPage.next_before_created_at
           ? { id: lastPage.next_before_id, createdAt: lastPage.next_before_created_at }
           : undefined,
+    }),
+  // A READY file's signed link: fresh until a minute before it expires
+  mediaLink: (chatId: string, messageId: string) =>
+    queryOptions({
+      queryKey: chatKeys.mediaLink(chatId, messageId),
+      queryFn: () => chatApi.getMedia(chatId, messageId),
+      // TanStack counts staleTime from when the data arrived
+      staleTime: (query) => (query.state.data ? linkStaleTime(query.state.data.expires_at, query.state.dataUpdatedAt) : 0),
+      gcTime: MEDIA_LINK_GC_MS,
     }),
 }
 

@@ -1,35 +1,74 @@
 import { FileTextIcon, ImageIcon, MicIcon, MusicIcon, StickerIcon, VideoIcon, type LucideIcon } from 'lucide-react'
 
-import type { MessageOf } from '../model/chat'
-import { mediaStateLabel } from '../model/message-media'
+import type { MessageOf, ReadyMediaRef } from '../model/chat'
+import { documentDetails, mediaStateLabel } from '../model/message-media'
+import { FileCard } from './file-card'
+import { FileDownloadCard } from './file-download-card'
+import { ImageMessage } from './image-message'
+import { MediaPlayer } from './media-player'
+import { StickerMessage } from './sticker-message'
 
 type MediaMessageType = 'IMAGE' | 'VIDEO' | 'AUDIO' | 'STICKER' | 'DOCUMENT'
+type FileMessage = MessageOf<MediaMessageType>
 
 interface MediaMessageProps {
-  message: MessageOf<MediaMessageType>
+  chatId: string
+  message: FileMessage
 }
 
-// A file the client sent. Until files are shown (MVP 3.3), a card says what it is and where its
-// download is; the caption, when there is one, reads like any text
-export function MediaMessage({ message }: MediaMessageProps) {
-  const { icon: Icon, label } = mediaLabel(message)
+// A file the client sent: a card while it downloads (or if it never arrived), then the file itself.
+// The caption, when there is one, reads like any text under it
+export function MediaMessage({ chatId, message }: MediaMessageProps) {
+  const media = message.payload.media
   const caption = 'caption' in message.payload ? message.payload.caption : null
+  const { icon, label } = mediaLabel(message)
 
   return (
     <div className="flex min-w-0 flex-col gap-1">
-      <div className="flex min-w-0 items-center gap-2 rounded-md border border-current/15 px-2 py-1.5">
-        <Icon aria-hidden="true" className="size-5 shrink-0 opacity-70" />
-        <div className="flex min-w-0 flex-col">
-          <span className="truncate text-body-sm font-medium">{label}</span>
-          <span className="text-caption opacity-70">{mediaStateLabel(message.payload.media)}</span>
-        </div>
-      </div>
+      {media.status === 'READY' ? (
+        <ReadyFile chatId={chatId} message={message} media={media} icon={icon} label={label} caption={caption} />
+      ) : (
+        <FileCard icon={icon} label={label} detail={mediaStateLabel(media)} />
+      )}
       {caption && <p className="text-body-sm whitespace-pre-wrap wrap-anywhere">{caption}</p>}
     </div>
   )
 }
 
-function mediaLabel(message: MessageOf<MediaMessageType>): { icon: LucideIcon; label: string } {
+interface ReadyFileProps {
+  chatId: string
+  message: FileMessage
+  media: ReadyMediaRef
+  icon: LucideIcon
+  label: string
+  caption: string | null
+}
+
+function ReadyFile({ chatId, message, media, icon, label, caption }: ReadyFileProps) {
+  const file = { chatId, messageId: message.id, media }
+  switch (message.type) {
+    case 'IMAGE':
+      return <ImageMessage {...file} caption={caption} />
+    case 'STICKER':
+      return <StickerMessage {...file} />
+    case 'AUDIO':
+      return <MediaPlayer {...file} kind="audio" icon={icon} label={label} />
+    case 'VIDEO':
+      return <MediaPlayer {...file} kind="video" icon={icon} label={label} />
+    case 'DOCUMENT':
+      return (
+        <FileDownloadCard
+          chatId={chatId}
+          messageId={message.id}
+          icon={icon}
+          label={label}
+          detail={documentDetails(message.payload.filename, media)}
+        />
+      )
+  }
+}
+
+function mediaLabel(message: FileMessage): { icon: LucideIcon; label: string } {
   switch (message.type) {
     case 'IMAGE':
       return { icon: ImageIcon, label: 'Photo' }

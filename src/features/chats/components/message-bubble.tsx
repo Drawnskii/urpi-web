@@ -18,6 +18,7 @@ const STATUS_ICONS: Record<MessageStatus, { icon: LucideIcon; label: string; cla
 }
 
 interface MessageBubbleProps {
+  chatId: string // the message's chat: its files are reached through it
   message: Message
   // Follows a message from the same side: the corner it touches is squared too, chaining the run
   isContinued?: boolean
@@ -31,7 +32,7 @@ interface MessageBubbleProps {
 }
 
 // One message: client messages on the left, the agent's and members' on the right
-export function MessageBubble({ message, isContinued = false, author = null, reaction, quoted }: MessageBubbleProps) {
+export function MessageBubble({ chatId, message, isContinued = false, author = null, reaction, quoted }: MessageBubbleProps) {
   const isClient = message.sender_type === 'CLIENT'
   // Client messages have no status (they're incoming)
   const status = message.status ? STATUS_ICONS[message.status] : null
@@ -49,7 +50,7 @@ export function MessageBubble({ message, isContinued = false, author = null, rea
         )}
       >
         {quoted !== undefined && <QuotedMessage quoted={quoted} />}
-        <MessageBody message={message} />
+        <MessageBody chatId={chatId} message={message} />
         {/* WhatsApp's place for it: over the bottom edge, on the side away from the tail */}
         {reaction && (
           <span

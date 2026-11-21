@@ -77,6 +77,7 @@ export function MessageList({ chatId, children }: MessageListProps) {
                       return (
                         <MessageBubble
                           key={message.id}
+                          chatId={chatId}
                           message={message}
                           isContinued={index > 0}
                           author={author}

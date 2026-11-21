@@ -1,6 +1,6 @@
 import { http } from '@/shared/api'
 
-import type { AddMessageInput, Chat, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
+import type { AddMessageInput, Chat, ChatPage, MediaLink, Message, MessagePage, RenameChatInput } from '../model/chat'
 
 export const chatApi = {
   // latest_per_client: the inbox, one row per client (its newest chat). client_id: that client's chats
@@ -28,6 +28,10 @@ export const chatApi = {
   // 201: the message is PENDING; the backend's send worker delivers it. 409 ChatClosedError on a closed chat
   addMessage: (chatId: string, input: AddMessageInput) =>
     http<Message>(`/chats/${chatId}/messages`, { method: 'POST', body: input }),
+
+  // A signed link to a READY file, valid a few minutes. 409 MediaNotReadyError before READY
+  getMedia: (chatId: string, messageId: string) =>
+    http<MediaLink>(`/chats/${chatId}/messages/${messageId}/media`),
 
   // 204: WhatsApp's blue ticks on the client's latest message (marks every earlier one too)
   markRead: (chatId: string) => http<void>(`/chats/${chatId}/read`, { method: 'POST' }),

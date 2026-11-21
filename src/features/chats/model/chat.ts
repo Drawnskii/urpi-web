@@ -75,6 +75,14 @@ export type MediaRef = {
   | { status: 'FAILED'; failure: string } // a code (TOO_LARGE, EXPIRED…), never shown as is
 )
 
+export type ReadyMediaRef = Extract<MediaRef, { status: 'READY' }>
+
+// Mirrors MediaLinkOut: anyone holding url reads the file until expires_at, so it's never stored
+export interface MediaLink {
+  url: string
+  expires_at: string // ISO 8601
+}
+
 // The client replied to a message, or forwarded one. Ids are Urpi's; null: a message Urpi doesn't have
 interface MessageContext {
   reply_to_message_id: string | null
