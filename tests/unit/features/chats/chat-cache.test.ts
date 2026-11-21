@@ -10,14 +10,16 @@ import {
   setUnreadCount,
   upsertMessage,
 } from '@/features/chats/api/chat-cache'
-import type { Chat, ChatPage, Message, MessagePage } from '@/features/chats/model/chat'
+import type { Chat, ChatPage, Message, MessageOf, MessagePage } from '@/features/chats/model/chat'
 
-function message(id: string, createdAt: string, overrides: Partial<Message> = {}): Message {
+function message(id: string, createdAt: string, overrides: Partial<MessageOf<'TEXT'>> = {}): Message {
   return {
     id,
     sender_type: 'CLIENT',
     sender_tenant_member_id: null,
     content: id,
+    type: 'TEXT',
+    payload: {},
     status: null,
     failure_reason: null,
     created_at: createdAt,

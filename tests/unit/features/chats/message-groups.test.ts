@@ -9,6 +9,8 @@ function message(id: string, day: number, hours: number, sender_type: SenderType
     sender_type,
     sender_tenant_member_id: null,
     content: id,
+    type: 'TEXT',
+    payload: {},
     status: null,
     failure_reason: null,
     created_at: new Date(2026, 9, day, hours, 0).toISOString(),

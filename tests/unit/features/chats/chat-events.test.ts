@@ -9,6 +9,8 @@ const message = {
   sender_type: 'CLIENT',
   sender_tenant_member_id: null as string | null,
   content: 'hola',
+  type: 'TEXT',
+  payload: {},
   status: null,
   failure_reason: null,
   created_at: '2026-10-21T10:01:00Z',
