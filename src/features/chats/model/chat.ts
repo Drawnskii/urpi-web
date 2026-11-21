@@ -61,12 +61,19 @@ type MessageType =
   | 'TEMPLATE'
   | 'UNSUPPORTED'
 
-// A file the client sent, as Meta names it; downloading it comes later (MVP 3.2)
-interface MediaRef {
+// A file the client sent and where its download is: waiting, being downloaded, in Urpi's bucket, or
+// never coming (backend: payload.media in message_payloads.py). Discriminated on status
+export type MediaRef = {
   meta_media_id: string
-  mime_type: string
+  mime_type: string // the type read from the bytes once READY
   sha256: string | null
-}
+  attempts: number
+} & (
+  | { status: 'PENDING'; retry_at: string | null } // the next attempt waits until retry_at
+  | { status: 'DOWNLOADING' }
+  | { status: 'READY'; key: string; size: number; width: number | null; height: number | null } // size in bytes; width, height: images as displayed
+  | { status: 'FAILED'; failure: string } // a code (TOO_LARGE, EXPIRED…), never shown as is
+)
 
 // The client replied to a message, or forwarded one. Ids are Urpi's; null: a message Urpi doesn't have
 interface MessageContext {
