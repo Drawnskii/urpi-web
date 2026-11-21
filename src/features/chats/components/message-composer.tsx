@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowUpIcon, ChevronDownIcon, FileTextIcon } from 'lucide-react'
+import { ArrowUpIcon, ChevronDownIcon, FileTextIcon, Undo2Icon } from 'lucide-react'
 import { useState, type ChangeEvent, type KeyboardEvent, type SubmitEvent } from 'react'
 
 import { Button } from '@/shared/components/ui/button'
@@ -74,13 +74,28 @@ function OpenChatComposer({ chat }: MessageComposerProps) {
         />
         <div className="flex items-center gap-2">
           {/* Where sending a template will start (after 24 hours, only a template can reach the client) */}
-          <Button type="button" variant="ghost" size="sm" disabled title="Sending templates from a chat is coming soon">
+          {/* The icon alone on phones: the row's room goes to the chats picker */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="shrink-0"
+            disabled
+            aria-label="Template"
+            title="Sending templates from a chat is coming soon"
+          >
             <FileTextIcon data-icon="inline-start" aria-hidden="true" />
-            Template
-            <ChevronDownIcon data-icon="inline-end" aria-hidden="true" />
+            <span className="hidden sm:inline">Template</span>
+            <ChevronDownIcon data-icon="inline-end" aria-hidden="true" className="hidden sm:block" />
           </Button>
           <ClientChatsPicker chat={chat} />
-          <Button type="submit" size="icon" className="ml-auto rounded-full" disabled={!content.trim()} aria-label="Send message">
+          <Button
+            type="submit"
+            size="icon"
+            className="ml-auto shrink-0 rounded-full"
+            disabled={!content.trim()}
+            aria-label="Send message"
+          >
             <ArrowUpIcon aria-hidden="true" />
           </Button>
         </div>
@@ -110,9 +125,11 @@ function ClosedChatNotice({ chat }: MessageComposerProps) {
         <div className="flex items-center gap-2">
           <ClientChatsPicker chat={chat} />
           {current && (
-            <Button asChild size="sm" className="ml-auto">
-              <Link to="/chats/$chatId" params={{ chatId: current.id }}>
-                Go to current chat
+            // Phones: the arrow alone, a 32px square like the picker, which gets the row's room
+            <Button asChild className="ml-auto shrink-0 max-sm:px-2">
+              <Link to="/chats/$chatId" params={{ chatId: current.id }} aria-label="Go to current chat">
+                <Undo2Icon data-icon="inline-start" aria-hidden="true" />
+                <span className="hidden sm:inline">Go to current chat</span>
               </Link>
             </Button>
           )}

@@ -25,11 +25,14 @@ export function ClientChatsPicker({ chat }: ClientChatsPickerProps) {
   }
 
   return (
-    <ButtonGroup>
+    // Shrinks with the composer's row: the label is cut with … rather than pushing the row wider
+    <ButtonGroup className="min-w-0">
       <CloseChatButton chat={chat} />
       <Select value={chat.id} onValueChange={handleChange}>
-        <SelectTrigger aria-label="This client's chats" className="font-mono tracking-tight">
-          <SelectValue />
+        <SelectTrigger aria-label="This client's chats" className="min-w-0 font-mono tracking-tight">
+          <SelectValue>
+            <span className="block truncate">{chatPeriodLabel(chat)}</span>
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {chats.map((current) => (

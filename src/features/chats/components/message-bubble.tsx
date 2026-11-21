@@ -31,7 +31,7 @@ export function MessageBubble({ message, isContinued = false, author = null }: M
   const status = message.status ? STATUS_ICONS[message.status] : null
 
   return (
-    <li className={cn('flex max-w-[75%] flex-col gap-1', isClient ? 'self-start' : 'self-end items-end')}>
+    <li className={cn('flex max-w-[85%] flex-col gap-1 sm:max-w-[75%]', isClient ? 'self-start' : 'self-end items-end')}>
       {/* The bottom corner nearest its side squared off, like a tail; a continued message squares its
           top one too, so a run of messages reads as one chain */}
       <div

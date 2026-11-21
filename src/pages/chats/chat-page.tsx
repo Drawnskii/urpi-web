@@ -1,7 +1,9 @@
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { getRouteApi } from '@tanstack/react-router'
+import { getRouteApi, Link } from '@tanstack/react-router'
+import { ArrowLeftIcon } from 'lucide-react'
 
-import { chatQueries, MessageComposer, MessageList } from '@/features/chats'
+import { chatDisplayName, chatQueries, MessageComposer, MessageList } from '@/features/chats'
+import { Button } from '@/shared/components/ui/button'
 
 const route = getRouteApi('/_app/chats/$chatId')
 
@@ -11,8 +13,19 @@ export function ChatPage() {
   const { data: chat } = useSuspenseQuery(chatQueries.detail(chatId))
 
   return (
-    <MessageList chatId={chatId}>
-      <MessageComposer chat={chat} />
-    </MessageList>
+    <>
+      {/* Below lg one pane at a time (ChatsPage): the way back to the list, and whose chat this is */}
+      <header className="flex h-12 shrink-0 items-center gap-2 border-b px-2 lg:hidden">
+        <Button asChild variant="ghost" size="icon-sm">
+          <Link to="/chats" aria-label="Back to chats">
+            <ArrowLeftIcon aria-hidden="true" />
+          </Link>
+        </Button>
+        <h2 className="truncate text-h4">{chatDisplayName(chat)}</h2>
+      </header>
+      <MessageList chatId={chatId}>
+        <MessageComposer chat={chat} />
+      </MessageList>
+    </>
   )
 }

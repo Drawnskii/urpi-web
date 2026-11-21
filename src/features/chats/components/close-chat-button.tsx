@@ -47,6 +47,7 @@ export function CloseChatButton({ chat }: CloseChatButtonProps) {
           type="button"
           variant="outline"
           size="icon"
+          className="shrink-0"
           disabled={isClosed}
           aria-label="Close chat"
           title={isClosed ? 'This chat is closed' : 'Close chat'}
