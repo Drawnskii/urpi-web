@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatDayLabel, formatListTime, formatTime, toLocalDay } from '@/shared/lib/format-date'
+import { formatDayLabel, formatListTime, formatShortDate, formatTime, toLocalDay } from '@/shared/lib/format-date'
 
 // Built from local times, so the expectations hold in any timezone the tests run in
 const localIso = (day: number, hours: number, minutes: number) => new Date(2026, 9, day, hours, minutes).toISOString()
@@ -58,5 +58,12 @@ describe('formatListTime', () => {
 
   it('is year-month-day, two digits each, before yesterday', () => {
     expect(formatListTime(localIso(16, 9, 0), now)).toBe('26-10-16')
+  })
+})
+
+describe('formatShortDate', () => {
+  it('leaves the year out for this year, and says it for another', () => {
+    expect(formatShortDate(localIso(16, 9, 0), now)).not.toContain('2026')
+    expect(formatShortDate(new Date(2025, 9, 16, 9, 0).toISOString(), now)).toContain('2025')
   })
 })

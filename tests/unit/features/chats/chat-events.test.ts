@@ -103,6 +103,16 @@ describe('chatLiveEvents', () => {
     expect(invalidateUnnamed).not.toHaveBeenCalledWith({ queryKey: ['chats', 'list'] })
   })
 
+  it("refetches the inbox and the clients' chats for a message of a chat it doesn't know (a new chat)", () => {
+    const queryClient = seededClient()
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
+
+    chatLiveEvents(queryClient).events['message.created']({ chat_id: 'c9', message })
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'list'] })
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'client'] })
+  })
+
   it('refetches the chat list and every chat on resync', () => {
     const queryClient = seededClient()
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries')

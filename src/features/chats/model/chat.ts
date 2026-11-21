@@ -1,3 +1,5 @@
+import { formatShortDate } from '@/shared/lib'
+
 // Mirrors app/modules/chat/api/schemas.py
 export type ChatStatus = 'ACTIVE' | 'HANDED_OFF' | 'CLOSED'
 
@@ -10,6 +12,8 @@ export interface Chat {
   status: ChatStatus
   last_message: Message | null  // newest message, any sender; null: no messages yet
   unread_count: number          // client messages after a member last read the chat (any member)
+  created_at: string            // ISO 8601: when the client's first message opened it
+  closed_at: string | null      // when a member closed it; null while open
 }
 
 const UNTITLED_CHAT = 'Untitled chat'
@@ -21,6 +25,14 @@ export const CHAT_TITLE_MAX_LENGTH = 255
 // Never the number: that's in the client's info popover
 export function chatDisplayName(chat: Pick<Chat, 'title' | 'client_name'>) {
   return chat.title ?? chat.client_name ?? UNTITLED_CHAT
+}
+
+// How the client's chats picker names a chat: the open one is the current chat, the others by
+// when they closed and opened ("Closed 12 Nov · opened 10 Nov")
+export function chatPeriodLabel(chat: Pick<Chat, 'created_at' | 'closed_at'>, now = new Date()) {
+  const opened = formatShortDate(chat.created_at, now)
+  if (!chat.closed_at) return `Current chat · since ${opened}`
+  return `Closed ${formatShortDate(chat.closed_at, now)} · opened ${opened}`
 }
 
 export interface ChatPage {

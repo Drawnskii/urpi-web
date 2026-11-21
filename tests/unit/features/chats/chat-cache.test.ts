@@ -1,7 +1,15 @@
 import type { InfiniteData } from '@tanstack/react-query'
 import { describe, expect, it } from 'vitest'
 
-import { applyMessageToChats, moveChatToTop, removeMessage, setChatTitle, setUnreadCount, upsertMessage } from '@/features/chats/api/chat-cache'
+import {
+  applyMessageToChats,
+  moveChatToTop,
+  removeMessage,
+  replaceChat,
+  setChatTitle,
+  setUnreadCount,
+  upsertMessage,
+} from '@/features/chats/api/chat-cache'
 import type { Chat, ChatPage, Message, MessagePage } from '@/features/chats/model/chat'
 
 function message(id: string, createdAt: string, overrides: Partial<Message> = {}): Message {
@@ -30,7 +38,8 @@ function messagePages(pages: Message[][], hasOlder = false): InfiniteData<Messag
 function chat(id: string, overrides: Partial<Chat> = {}): Chat {
   return {
     id, client_id: `client-${id}`, title: id, client_name: null, client_phone_number: null,
-    status: 'ACTIVE', last_message: null, unread_count: 0, ...overrides,
+    status: 'ACTIVE', last_message: null, unread_count: 0, created_at: '2026-10-16T09:00:00Z', closed_at: null,
+    ...overrides,
   }
 }
 
@@ -176,5 +185,21 @@ describe('setChatTitle', () => {
 
     expect(setChatTitle(data, 'c1', null)?.pages[0].chats[0].title).toBeNull()
     expect(setChatTitle(data, 'missing', 'Reserva')).toBe(data)
+  })
+})
+
+describe('replaceChat', () => {
+  it("puts the server's chat where it is, without moving it", () => {
+    const closed = chat('b', { status: 'CLOSED', closed_at: '2026-10-16T10:00:00Z' })
+
+    const data = replaceChat(chatPages([[chat('a'), chat('b')]]), closed)
+
+    expect(data?.pages[0].chats.map((c) => [c.id, c.status])).toEqual([['a', 'ACTIVE'], ['b', 'CLOSED']])
+  })
+
+  it("leaves the list alone when the chat isn't in it", () => {
+    const data = chatPages([[chat('a')]])
+
+    expect(replaceChat(data, chat('z'))).toBe(data)
   })
 })

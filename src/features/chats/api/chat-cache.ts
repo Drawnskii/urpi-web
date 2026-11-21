@@ -99,6 +99,12 @@ export function setChatTitle(data: Chats, chatId: string, title: string | null):
   return patchChat(data, chatId, (current) => ({ ...current, title }))
 }
 
+// The server's chat (closed, for one), where it is. Nothing moves: closing isn't activity
+export function replaceChat(data: Chats, chat: Chat): Chats {
+  if (!data || !findChat(data, chat.id)) return data
+  return patchChat(data, chat.id, () => chat)
+}
+
 // chat.read: a member read the chat; the count is the server's, as of the push
 export function setUnreadCount(data: Chats, chatId: string, unreadCount: number): Chats {
   if (!data || !findChat(data, chatId)) return data

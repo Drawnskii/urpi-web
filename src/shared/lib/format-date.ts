@@ -4,6 +4,8 @@
 const timeFormat = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' })
 const dateTimeFormat = new Intl.DateTimeFormat(undefined, { dateStyle: 'medium', timeStyle: 'short', hourCycle: 'h23' })
 const dayFormat = new Intl.DateTimeFormat(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+const shortDateFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short' })
+const shortDateWithYearFormat = new Intl.DateTimeFormat(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
 // numeric: 'auto' says "today" and "yesterday" (in the viewer's language) instead of "0 days ago"
 const relativeDay = new Intl.RelativeTimeFormat(undefined, { numeric: 'auto' })
 
@@ -47,6 +49,12 @@ export function formatListTime(iso: string, now = new Date()) {
   if (days <= 0) return formatTime(iso)
   if (days === 1) return capitalize(relativeDay.format(-1, 'day'))
   return toLocalDay(iso).slice(2)
+}
+
+// "19 Nov", with the year only when it isn't this one ("12 Nov 2025"): a day in a short label
+export function formatShortDate(iso: string, now = new Date()) {
+  const date = new Date(iso)
+  return (date.getFullYear() === now.getFullYear() ? shortDateFormat : shortDateWithYearFormat).format(date)
 }
 
 // "Today", "Yesterday", or "Thursday, 16 October 2026": in the viewer's timezone and locale.

@@ -21,7 +21,12 @@ export function applyMessage(queryClient: QueryClient, kind: MessageEventKind, {
   const chats = applyMessageToChats(list, chat_id, message)
   const isNew = kind === 'message.created'
   if (!chats) {
-    if (isNew) void queryClient.invalidateQueries({ queryKey: chatKeys.list() }) // a new chat
+    if (isNew) {
+      // A new chat: maybe a client's next one after a closed chat, which replaces its inbox row and
+      // becomes the current chat in its picker
+      void queryClient.invalidateQueries({ queryKey: chatKeys.list() })
+      void queryClient.invalidateQueries({ queryKey: chatKeys.allClientChats() })
+    }
     return
   }
   patchOrRefetch<InfiniteData<ChatPage>>(queryClient, chatKeys.list(), () => chats)

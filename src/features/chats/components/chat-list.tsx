@@ -1,5 +1,5 @@
-import { useSuspenseInfiniteQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
+import { useQuery, useSuspenseInfiniteQuery } from '@tanstack/react-query'
+import { Link, useParams } from '@tanstack/react-router'
 import { UserIcon } from 'lucide-react'
 
 import { Avatar, AvatarFallback } from '@/shared/components/ui/avatar'
@@ -19,6 +19,9 @@ const UNREAD_SHOWN_MAX = 99
 export function ChatList() {
   const { data } = useSuspenseInfiniteQuery(chatQueries.list())
   const chats = data.pages.flatMap((page) => page.chats)
+  // The open chat may be a client's past one, which isn't in the inbox: its client's row is the current one
+  const { chatId } = useParams({ strict: false })
+  const { data: openChat } = useQuery({ ...chatQueries.detail(chatId ?? ''), enabled: Boolean(chatId) })
 
   if (chats.length === 0) return <p className="p-4 text-muted-foreground">No chats yet</p>
 
@@ -44,7 +47,7 @@ export function ChatList() {
                 <Link
                   to="/chats/$chatId"
                   params={{ chatId: chat.id }}
-                  activeProps={{ 'aria-current': 'page' }}
+                  aria-current={chat.id === chatId || chat.client_id === openChat?.client_id ? 'page' : undefined}
                   draggable={false}
                 >
                   <Avatar>

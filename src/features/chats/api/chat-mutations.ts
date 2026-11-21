@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 
-import type { AddMessageInput, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
+import type { AddMessageInput, Chat, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
 import { chatApi } from './chat-api'
-import { removeMessage, setChatTitle, upsertMessage } from './chat-cache'
+import { removeMessage, replaceChat, setChatTitle, upsertMessage } from './chat-cache'
 import { chatKeys } from './chat-queries'
 
 // Three things arrive in any order: the optimistic message, the POST's 201 and message.created
@@ -94,6 +94,21 @@ export function useRenameChat(chatId: string) {
     },
     onError: (_error, _input, onMutateResult) => {
       if (onMutateResult?.previous) queryClient.setQueryData(queryKey, onMutateResult.previous)
+    },
+  })
+}
+
+// Not optimistic: closing can't be undone, so the chat shows closed only once the server says so.
+// The inbox row stays (the client's newest chat, now closed) until the client writes again
+export function useCloseChat(chatId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: () => chatApi.close(chatId),
+    onSuccess: (closed) => {
+      queryClient.setQueryData<Chat>(chatKeys.detail(chatId), closed)
+      queryClient.setQueryData<InfiniteData<ChatPage>>(chatKeys.list(), (data) => replaceChat(data, closed))
+      void queryClient.invalidateQueries({ queryKey: chatKeys.clientChats(closed.client_id) })
     },
   })
 }
