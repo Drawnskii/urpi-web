@@ -11,6 +11,7 @@ import { useRespondingLabel } from '../hooks/use-responding-label'
 import { useTeam } from '../hooks/use-team'
 import { authorFullName, messageAuthor, sameAuthor } from '../model/message-author'
 import { groupMessagesByDay, groupMessagesBySide } from '../model/message-groups'
+import { isReaction, reactionsByTarget } from '../model/message-reactions'
 import { MessageBubble } from './message-bubble'
 import { RespondingBubble } from './responding-bubble'
 
@@ -28,7 +29,11 @@ export function MessageList({ chatId, children }: MessageListProps) {
 
   // The API sends newest first; a chat reads oldest at the top. Grouped after flattening, so a
   // day split across two loaded pages is still one group
-  const messages = data.pages.flatMap((page) => page.messages).reverse()
+  const loaded = data.pages.flatMap((page) => page.messages).reverse()
+  // A reaction isn't a bubble: its emoji sits on the message it reacts to
+  const reactions = reactionsByTarget(loaded)
+  const messages = loaded.filter((message) => !isReaction(message))
+  const byId = new Map(messages.map((message) => [message.id, message]))
   const days = groupMessagesByDay(messages)
   const lastMessageId = messages.at(-1)?.id
   const team = useTeam()
@@ -66,8 +71,18 @@ export function MessageList({ chatId, children }: MessageListProps) {
                       const next = run.messages[index + 1]
                       const isAuthorsLast = !next || !sameAuthor(message, next)
                       const author = isAuthorsLast ? authorFullName(messageAuthor(message, team)) : null
+                      // A reply quotes what it answers: null when that message isn't loaded or Urpi doesn't have it
+                      const replyTo = message.payload.context?.reply_to_message_id
+                      const quoted = replyTo === undefined ? undefined : (byId.get(replyTo ?? '') ?? null)
                       return (
-                        <MessageBubble key={message.id} message={message} isContinued={index > 0} author={author} />
+                        <MessageBubble
+                          key={message.id}
+                          message={message}
+                          isContinued={index > 0}
+                          author={author}
+                          reaction={reactions.get(message.id)}
+                          quoted={quoted}
+                        />
                       )
                     })}
                   </ol>

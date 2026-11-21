@@ -24,6 +24,8 @@ export function useAddMessage(chatId: string) {
         sender_type: 'TENANT_MEMBER',
         sender_tenant_member_id: memberId,
         content: input.content,
+        type: 'TEXT',
+        payload: {},
         status: 'PENDING',
         failure_reason: null,
         created_at: new Date().toISOString(),

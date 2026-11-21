@@ -45,15 +45,73 @@ export type SenderType = 'CLIENT' | 'AGENT' | 'TENANT_MEMBER'
 
 export type MessageStatus = 'PENDING' | 'SENDING' | 'SENT' | 'DELIVERED' | 'READ' | 'FAILED'
 
-export interface Message {
+// What a message holds. content is always readable, so a type this list doesn't name yet (a newer
+// backend) still shows: the body falls back to content
+type MessageType =
+  | 'TEXT'
+  | 'IMAGE'
+  | 'AUDIO'
+  | 'VIDEO'
+  | 'DOCUMENT'
+  | 'STICKER'
+  | 'LOCATION'
+  | 'CONTACTS'
+  | 'REACTION'
+  | 'INTERACTIVE'
+  | 'TEMPLATE'
+  | 'UNSUPPORTED'
+
+// A file the client sent, as Meta names it; downloading it comes later (MVP 3.2)
+interface MediaRef {
+  meta_media_id: string
+  mime_type: string
+  sha256: string | null
+}
+
+// The client replied to a message, or forwarded one. Ids are Urpi's; null: a message Urpi doesn't have
+interface MessageContext {
+  reply_to_message_id: string | null
+  forwarded: boolean
+}
+
+// One payload per type, as the backend stores it (app/modules/chat/domain/message_payloads.py)
+export interface MessagePayloads {
+  TEXT: Record<string, never>
+  IMAGE: { media: MediaRef; caption: string | null }
+  VIDEO: { media: MediaRef; caption: string | null }
+  AUDIO: { media: MediaRef; voice: boolean } // voice: a voice note, not an audio file
+  STICKER: { media: MediaRef; animated: boolean }
+  DOCUMENT: { media: MediaRef; filename: string | null; caption: string | null }
+  LOCATION: { latitude: number; longitude: number; name: string | null; address: string | null; url: string | null }
+  CONTACTS: { contacts: { name: string; phones: { phone: string; wa_id: string | null }[] }[] }
+  REACTION: { target_message_id: string | null; emoji: string } // emoji "": the client removed it
+  INTERACTIVE: {
+    kind: 'button_reply' | 'list_reply' | 'button' | 'product'
+    id: string
+    title: string
+    description: string | null
+  }
+  TEMPLATE: { name: string; language: string; parameters: string[] }
+  UNSUPPORTED: { meta_type: string } // Meta's name for it: order, edit, poll_creation…
+}
+
+interface MessageBase {
   id: string
   sender_type: SenderType
   sender_tenant_member_id: string | null  // TENANT_MEMBER: who wrote it; null on the others, and once the member is deleted
-  content: string
+  content: string                // always readable: the text, or a placeholder ("📷 Photo: caption")
   status: MessageStatus | null   // null on client messages
   failure_reason: string | null  // FAILED only
   created_at: string             // ISO 8601
 }
+
+// Mirrors MessageOut (app/modules/chat/api/schemas.py): discriminated on type, so a switch on it
+// narrows the payload. Any type may carry a context
+export type Message = {
+  [T in MessageType]: MessageBase & { type: T; payload: MessagePayloads[T] & { context?: MessageContext } }
+}[MessageType]
+
+export type MessageOf<T extends MessageType> = Extract<Message, { type: T }>
 
 export interface MessagePage {
   messages: Message[]                    // newest first
