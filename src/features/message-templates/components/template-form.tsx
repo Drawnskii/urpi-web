@@ -189,7 +189,7 @@ export function TemplateForm() {
 
       {hasNoNumber && (
         <p role="alert" className="text-body-sm text-destructive">
-          Connect a WhatsApp number first: templates belong to it. <Link to="/">Go to the home page</Link>
+          Connect a WhatsApp number first: templates belong to it. <Link to="/whatsapp">Connect a number</Link>
         </p>
       )}
       {formError && <p role="alert" className="text-body-sm text-destructive">{formError}</p>}

@@ -51,7 +51,7 @@ export function AppSidebar() {
         {/* A plain link, not a menu button: no hover background, and the logo keeps its own size. No side
             padding: the pigeon sits at the header's edge, the same place expanded and collapsed */}
         <Link
-          to="/"
+          to="/dashboard"
           aria-label="Urpi, home"
           className="flex h-12 items-center rounded-md outline-hidden ring-sidebar-ring focus-visible:ring-2"
         >

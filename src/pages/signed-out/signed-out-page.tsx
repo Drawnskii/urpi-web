@@ -1,6 +1,6 @@
 import { getRouteApi } from '@tanstack/react-router'
 
-import { loginUrl } from '@/features/auth'
+import { APP_LOGIN_URL } from '@/features/auth'
 import { CombinationMark } from '@/shared/components/brand/combination-mark'
 import { Button } from '@/shared/components/ui/button'
 
@@ -36,7 +36,7 @@ export function SignedOutPage() {
       </div>
       {/* A full page navigation: signing in is the backend's route, not the router's */}
       <Button asChild>
-        <a href={loginUrl('/')}>{message.action}</a>
+        <a href={APP_LOGIN_URL}>{message.action}</a>
       </Button>
     </main>
   )

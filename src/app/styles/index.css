@@ -104,7 +104,7 @@
 /* Type scale: text-display … text-caption set size, line height and weight together.
    Font family comes from the typography roles below (headings sans, body serif, labels mono) */
 @theme {
-  --text-display: 3rem;
+  --text-display: 3.5rem;
   --text-display--line-height: 1.1;
   --text-display--font-weight: 600;
   --text-h1: 2.25rem;
@@ -280,5 +280,22 @@
   body {
     @apply bg-background text-body text-foreground;
     letter-spacing: var(--tracking-normal);
+  }
+}
+
+@keyframes ray-drift {
+  0% {
+    opacity: 0;
+    transform: translateX(60px) rotate(-28deg);
+  }
+  25% {
+    opacity: 0.9;
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-80px) rotate(-28deg);
   }
 }

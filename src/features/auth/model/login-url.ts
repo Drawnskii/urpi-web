@@ -5,3 +5,6 @@ import { env } from '@/shared/config'
 export function loginUrl(returnTo: string) {
   return `${env.apiUrl}/auth/login?return_to=${encodeURIComponent(returnTo)}`
 }
+
+// Signing in from outside the app (the landing page, the signed-out page) opens the app's home
+export const APP_LOGIN_URL = loginUrl('/dashboard')

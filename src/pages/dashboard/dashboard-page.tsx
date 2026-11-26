@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router'
 
 import { Button } from '@/shared/components/ui/button'
 
-export function HomePage() {
+export function DashboardPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center gap-10 p-6">
       <header className="flex flex-col gap-2">
