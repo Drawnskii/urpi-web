@@ -44,6 +44,12 @@ export function documentDetails(filename: string | null, media: ReadyMediaRef): 
   return kind ? `${kind} · ${fileSize(media.size)}` : fileSize(media.size)
 }
 
+// A player's time, "0:07" or "12:34"
+export function playbackTime(seconds: number): string {
+  const whole = Math.floor(seconds)
+  return `${Math.floor(whole / 60)}:${String(whole % 60).padStart(2, '0')}`
+}
+
 export function mediaAspectRatio(width: number | null, height: number | null): number {
   if (!width || !height) return UNKNOWN_ASPECT_RATIO
   return Math.min(MAX_ASPECT_RATIO, Math.max(MIN_ASPECT_RATIO, width / height))

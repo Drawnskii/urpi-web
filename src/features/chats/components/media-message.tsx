@@ -17,7 +17,7 @@ interface MediaMessageProps {
 }
 
 // A file the client sent: a card while it downloads (or if it never arrived), then the file itself.
-// The caption, when there is one, reads like any text under it
+// The caption, when there is one, reads like any text under it; a voice note's transcript is the player's
 export function MediaMessage({ chatId, message }: MediaMessageProps) {
   const media = message.payload.media
   const caption = 'caption' in message.payload ? message.payload.caption : null
@@ -52,7 +52,9 @@ function ReadyFile({ chatId, message, media, icon, label, caption }: ReadyFilePr
     case 'STICKER':
       return <StickerMessage {...file} />
     case 'AUDIO':
-      return <MediaPlayer {...file} kind="audio" icon={icon} label={label} />
+      return (
+        <MediaPlayer {...file} kind="audio" icon={icon} label={label} transcript={message.payload.transcript ?? null} />
+      )
     case 'VIDEO':
       return <MediaPlayer {...file} kind="video" icon={icon} label={label} />
     case 'DOCUMENT':

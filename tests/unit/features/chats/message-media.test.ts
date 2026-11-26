@@ -7,6 +7,7 @@ import {
   linkStaleTime,
   mediaAspectRatio,
   mediaStateLabel,
+  playbackTime,
 } from '@/features/chats/model/message-media'
 
 const FILE = { meta_media_id: 'm', mime_type: 'application/pdf', sha256: null, attempts: 1 }
@@ -74,5 +75,16 @@ describe('linkStaleTime', () => {
   it('is 0 for a link fetched inside its last minute or after it', () => {
     expect(linkStaleTime('2026-11-21T15:00:30Z', fetchedAt)).toBe(0)
     expect(linkStaleTime('2026-11-21T14:59:00Z', fetchedAt)).toBe(0)
+  })
+})
+
+describe('playbackTime', () => {
+  it.each([
+    [0, '0:00'],
+    [7.9, '0:07'],
+    [65, '1:05'],
+    [754, '12:34'],
+  ])('shows %s seconds as %s', (seconds, shown) => {
+    expect(playbackTime(seconds)).toBe(shown)
   })
 })

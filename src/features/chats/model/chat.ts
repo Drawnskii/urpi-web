@@ -94,7 +94,9 @@ export interface MessagePayloads {
   TEXT: Record<string, never>
   IMAGE: { media: MediaRef; caption: string | null }
   VIDEO: { media: MediaRef; caption: string | null }
-  AUDIO: { media: MediaRef; voice: boolean } // voice: a voice note, not an audio file
+  // voice: a voice note, not an audio file. transcript: null until transcribed, or if it can't be
+  // (too long, no speech); missing on audio received before transcripts existed
+  AUDIO: { media: MediaRef; voice: boolean; transcript?: string | null }
   STICKER: { media: MediaRef; animated: boolean }
   DOCUMENT: { media: MediaRef; filename: string | null; caption: string | null }
   LOCATION: { latitude: number; longitude: number; name: string | null; address: string | null; url: string | null }

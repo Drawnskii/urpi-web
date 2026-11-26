@@ -203,9 +203,10 @@
     @apply border-border outline-ring/50;
   }
   /* Anything clickable shows the hand, like a link: Preflight leaves buttons at the default arrow.
-     Covers icon buttons, triggers built on <button> (popover, select, sidebar) and options in lists.
-     Disabled ones keep the arrow; a cursor-* class still overrides it */
+     Covers icon buttons, triggers built on <button> (popover, select, sidebar), options in lists and
+     sliders. Disabled ones keep the arrow; a cursor-* class still overrides it */
   button:not(:disabled),
+  input[type="range"]:not(:disabled),
   [role="button"]:not([aria-disabled="true"]),
   [role="option"]:not([data-disabled]),
   [role="menuitem"]:not([data-disabled]),
