@@ -1,5 +1,6 @@
 import type { Message } from '../model/chat'
 import { ContactsMessage } from './contacts-message'
+import { FormattedText } from './formatted-text'
 import { InteractiveReplyMessage } from './interactive-reply-message'
 import { LocationMessage } from './location-message'
 import { MediaMessage } from './media-message'
@@ -26,8 +27,6 @@ export function MessageBody({ chatId, message }: MessageBodyProps) {
     case 'INTERACTIVE':
       return <InteractiveReplyMessage message={message} />
     default:
-      // wrap-anywhere: a long word or link with no spaces wraps inside the bubble instead of
-      // widening it past 75% and pushing the page sideways
-      return <p className="text-body-sm whitespace-pre-wrap wrap-anywhere">{message.content}</p>
+      return <FormattedText text={message.content} />
   }
 }

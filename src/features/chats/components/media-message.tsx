@@ -4,6 +4,7 @@ import type { MessageOf, ReadyMediaRef } from '../model/chat'
 import { documentDetails, mediaStateLabel } from '../model/message-media'
 import { FileCard } from './file-card'
 import { FileDownloadCard } from './file-download-card'
+import { FormattedText } from './formatted-text'
 import { ImageMessage } from './image-message'
 import { MediaPlayer } from './media-player'
 import { StickerMessage } from './sticker-message'
@@ -30,7 +31,7 @@ export function MediaMessage({ chatId, message }: MediaMessageProps) {
       ) : (
         <FileCard icon={icon} label={label} detail={mediaStateLabel(media)} />
       )}
-      {caption && <p className="text-body-sm whitespace-pre-wrap wrap-anywhere">{caption}</p>}
+      {caption && <FormattedText text={caption} />}
     </div>
   )
 }

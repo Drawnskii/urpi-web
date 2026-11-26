@@ -1,13 +1,14 @@
 import { ImageIcon } from 'lucide-react'
 import { useState } from 'react'
 
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '@/shared/components/ui/dialog'
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '@/shared/components/ui/dialog'
 import { Skeleton } from '@/shared/components/ui/skeleton'
 
 import { useInView } from '../hooks/use-in-view'
 import { useMediaLink } from '../hooks/use-media-link'
 import type { ReadyMediaRef } from '../model/chat'
 import { mediaAspectRatio } from '../model/message-media'
+import { FormattedText } from './formatted-text'
 import { MediaUnavailable } from './media-unavailable'
 
 interface ImageMessageProps {
@@ -58,11 +59,11 @@ export function ImageMessage({ chatId, messageId, media, caption }: ImageMessage
           )}
         </button>
       </DialogTrigger>
-      {/* Without a caption there's no description: say so, or Radix warns */}
-      <DialogContent className="max-h-svh gap-2 p-2 sm:max-w-3xl" {...(!caption && { 'aria-describedby': undefined })}>
+      {/* No Radix description: the photo's alt already reads the caption, which shows formatted under it */}
+      <DialogContent className="max-h-svh gap-2 p-2 sm:max-w-3xl" aria-describedby={undefined}>
         <DialogTitle className="sr-only">Photo</DialogTitle>
         <img src={link.url} alt={alt} className="max-h-[85svh] w-full rounded-md object-contain" />
-        {caption && <DialogDescription className="px-1 whitespace-pre-wrap wrap-anywhere">{caption}</DialogDescription>}
+        {caption && <FormattedText text={caption} className="px-1" />}
       </DialogContent>
     </Dialog>
   )
