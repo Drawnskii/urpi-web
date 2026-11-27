@@ -42,6 +42,7 @@ function chat(id: string, overrides: Partial<Chat> = {}): Chat {
   return {
     id, client_id: `client-${id}`, title: id, client_name: null, client_phone_number: null,
     status: 'ACTIVE', last_message: null, unread_count: 0, created_at: '2026-10-16T09:00:00Z', closed_at: null,
+    last_client_message_at: null, window_expires_at: null,
     ...overrides,
   }
 }

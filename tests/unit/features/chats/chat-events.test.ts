@@ -117,6 +117,31 @@ describe('chatLiveEvents', () => {
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'client'] })
   })
 
+  it.each([
+    ['a client message', 'message.created', message],
+    ['a failed send', 'message.updated', { ...message, sender_type: 'TENANT_MEMBER', status: 'FAILED' }],
+  ] as const)('fetches the chat again for %s: its service window may have changed', (_what, kind, pushed) => {
+    const queryClient = seededClient()
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
+
+    chatLiveEvents(queryClient).events[kind]({ chat_id: 'c2', message: pushed })
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'detail', 'c2'] })
+  })
+
+  it.each([
+    ["an update of a client's message (its file arrived)", 'message.updated', message],
+    ["a member's message", 'message.created', { ...message, sender_type: 'TENANT_MEMBER', status: 'PENDING' }],
+    ["the agent's reply being delivered", 'message.updated', { ...message, sender_type: 'AGENT', status: 'DELIVERED' }],
+  ] as const)("doesn't fetch the chat again for %s", (_what, kind, pushed) => {
+    const queryClient = seededClient()
+    const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
+
+    chatLiveEvents(queryClient).events[kind]({ chat_id: 'c2', message: pushed })
+
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: ['chats', 'detail', 'c2'] })
+  })
+
   it('refetches the chat list and every chat on resync', () => {
     const queryClient = seededClient()
     const invalidate = vi.spyOn(queryClient, 'invalidateQueries')
@@ -124,6 +149,7 @@ describe('chatLiveEvents', () => {
     chatLiveEvents(queryClient).events.resync({})
 
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'list'] })
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'detail'] })
     expect(invalidate).toHaveBeenCalledWith({ queryKey: ['chats', 'messages'] })
   })
 
