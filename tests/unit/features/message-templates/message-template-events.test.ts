@@ -41,6 +41,11 @@ describe('upsertTemplate', () => {
     const byLanguage = upsertTemplate([template('t1', 'a', 'PENDING', 'es')], template('t2', 'a', 'PENDING', 'en_US'))
     expect(byLanguage?.map((t) => t.language)).toEqual(['en_US', 'es'])
   })
+
+  it('takes a deleted one out, like the backend list', () => {
+    const result = upsertTemplate([template('t1', 'a'), template('t2', 'b')], template('t1', 'a', 'DELETED'))
+    expect(result?.map((t) => t.id)).toEqual(['t2'])
+  })
 })
 
 describe('templateLiveEvents', () => {

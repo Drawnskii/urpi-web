@@ -2,11 +2,18 @@ import { describe, expect, it } from 'vitest'
 
 import {
   checkTemplateDraft,
+  checkTemplateValues,
   hasDraftErrors,
+  hasValueErrors,
+  pickerTemplates,
   previewTemplate,
+  rejectionExplanation,
+  STARTER_TEMPLATES,
   templateVariables,
   toCreateInput,
   toTemplateName,
+  type MessageTemplate,
+  type MessageTemplateStatus,
 } from '@/features/message-templates/model/message-template'
 
 const draft = (body: string, examples: Record<string, string> = {}, name = 'booking_confirmation') => ({
@@ -79,6 +86,67 @@ describe('checkTemplateDraft', () => {
     expect(checkTemplateDraft(draft('Hola {{client_name}}, el {{date}}.', { client_name: 'Ana' })).examples).toEqual({
       date: 'Required: Meta reviews the template with it',
     })
+  })
+})
+
+describe('pickerTemplates', () => {
+  const template = (name: string, status: MessageTemplateStatus, body = 'Hola.') =>
+    ({ name, status, body }) as MessageTemplate
+  const templates = [
+    template('a_pending', 'PENDING'),
+    template('b_approved', 'APPROVED', 'Tu pedido está listo.'),
+    template('c_rejected', 'REJECTED'),
+    template('d_approved', 'APPROVED'),
+  ]
+  const names = (search: string) => pickerTemplates(templates, search).map((t) => t.name)
+
+  it('puts the approved ones first, each group in the order it came', () => {
+    expect(names('')).toEqual(['b_approved', 'd_approved', 'a_pending', 'c_rejected'])
+  })
+
+  it('searches the name and the text, whatever the case', () => {
+    expect(names(' PEDIDO ')).toEqual(['b_approved'])
+    expect(names('rejected')).toEqual(['c_rejected'])
+    expect(names('nada')).toEqual([])
+  })
+})
+
+describe('checkTemplateValues', () => {
+  const template = { body: 'Hola {{name}}, el {{date}}.', variables: ['name', 'date'] }
+
+  it('accepts one value per variable', () => {
+    const errors = checkTemplateValues(template, { name: 'Ana', date: 'a    b' })
+
+    expect(errors).toEqual({ variables: {} })
+    expect(hasValueErrors(errors)).toBe(false)
+  })
+
+  it('names each variable that is missing or that WhatsApp refuses', () => {
+    expect(checkTemplateValues(template, { name: '  ', date: 'five     spaces' }).variables).toEqual({
+      name: 'Required',
+      date: 'No line breaks, tabs or more than 4 spaces in a row',
+    })
+    expect(checkTemplateValues(template, { name: 'Ana', date: 'two\nlines' }).variables.date).toBeDefined()
+  })
+
+  it('refuses a filled message over 1024 characters', () => {
+    const errors = checkTemplateValues(template, { name: 'a'.repeat(1020), date: 'lunes' })
+
+    expect(errors.tooLong).toContain('1024')
+    expect(hasValueErrors(errors)).toBe(true)
+  })
+})
+
+describe('rejectionExplanation', () => {
+  it("puts Meta's codes in plain words and keeps its sentences", () => {
+    expect(rejectionExplanation('PROMOTIONAL')).toContain('Marketing')
+    expect(rejectionExplanation('Add text between the variables.')).toBe('Add text between the variables.')
+  })
+})
+
+describe('STARTER_TEMPLATES', () => {
+  it('are all ready to send to review', () => {
+    for (const starter of STARTER_TEMPLATES) expect(checkTemplateDraft(starter.draft)).toEqual({})
   })
 })
 
