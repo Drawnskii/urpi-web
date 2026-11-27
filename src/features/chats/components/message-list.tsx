@@ -97,7 +97,7 @@ export function MessageList({ chatId, children }: MessageListProps) {
       {/* Sticky at the bottom, so messages pass under the composer's card; the space around the card
           is transparent and lets clicks through. Part of the scrolled content, so the newest
           message rests just above it */}
-      <div className="pointer-events-none sticky bottom-0 z-20 **:pointer-events-auto [&>form]:pointer-events-none bg-linear-to-t from-background via-background/80 to-transparent">{children}</div>
+      <div className="pointer-events-none sticky bottom-0 z-20 **:pointer-events-auto [&>:is(form,div)]:pointer-events-none bg-linear-to-t from-background via-background/80 to-transparent">{children}</div>
       <div ref={bottomRef} />
     </ScrollArea>
   )

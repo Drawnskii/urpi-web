@@ -24,7 +24,8 @@ export function ChatPage() {
         <h2 className="truncate text-h4">{chatDisplayName(chat)}</h2>
       </header>
       <MessageList chatId={chatId}>
-        <MessageComposer chat={chat} />
+        {/* Keyed: this page stays mounted between chats, and a draft must never follow to another client */}
+        <MessageComposer key={chat.id} chat={chat} />
       </MessageList>
     </>
   )
