@@ -7,7 +7,8 @@ import { chatApi } from './chat-api'
 export const chatKeys = {
   all: ['chats'] as const,
   list: () => [...chatKeys.all, 'list'] as const,
-  detail: (chatId: string) => [...chatKeys.all, 'detail', chatId] as const,
+  allDetails: () => [...chatKeys.all, 'detail'] as const,
+  detail: (chatId: string) => [...chatKeys.allDetails(), chatId] as const,
   allClientChats: () => [...chatKeys.all, 'client'] as const,
   clientChats: (clientId: string) => [...chatKeys.allClientChats(), clientId] as const,
   allMessages: () => [...chatKeys.all, 'messages'] as const,

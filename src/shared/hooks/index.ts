@@ -1,1 +1,1 @@
-export { useDocumentVisible } from './use-document-visible'
+export { subscribeToVisibility, useDocumentVisible } from './use-document-visible'

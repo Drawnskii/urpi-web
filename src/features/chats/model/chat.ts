@@ -14,6 +14,8 @@ export interface Chat {
   unread_count: number          // client messages after a member last read the chat (any member)
   created_at: string            // ISO 8601: when the client's first message opened it
   closed_at: string | null      // when a member closed it; null while open
+  last_client_message_at: string | null // when the client last wrote; null: never
+  window_expires_at: string | null      // free text reaches the client before this; then only templates
 }
 
 const UNTITLED_CHAT = 'Untitled chat'

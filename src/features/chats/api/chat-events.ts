@@ -15,6 +15,11 @@ type MessageEventKind = 'message.created' | 'message.updated'
 function applyMessage(queryClient: QueryClient, kind: MessageEventKind, { chat_id, message }: ChatEvent) {
   const isNew = kind === 'message.created'
   if (isNew) applyNewReply(queryClient, chat_id, message)
+  // The chat's service window: a client message moves it, and a failed send may have closed it. The
+  // event doesn't carry it (the rule is the backend's), so the chat is fetched again
+  if ((isNew && message.sender_type === 'CLIENT') || message.status === 'FAILED') {
+    void queryClient.invalidateQueries({ queryKey: chatKeys.detail(chat_id) })
+  }
   patchOrRefetch<InfiniteData<MessagePage>>(queryClient, chatKeys.messages(chat_id), (data) =>
     upsertMessage(data, message),
   )
@@ -77,6 +82,7 @@ export function chatLiveEvents(queryClient: QueryClient): LiveEventsSubscriber {
       // Rare: more was missed than the server replays (200 changes): refetch what's on screen
       resync: () => {
         void queryClient.invalidateQueries({ queryKey: chatKeys.list() })
+        void queryClient.invalidateQueries({ queryKey: chatKeys.allDetails() })
         void queryClient.invalidateQueries({ queryKey: chatKeys.allMessages() })
       },
     },

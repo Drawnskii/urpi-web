@@ -1,11 +1,15 @@
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 
 import { useCurrentTenant } from '@/features/tenants'
+import { isApiError } from '@/shared/api'
 
 import type { AddMessageInput, Chat, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
 import { chatApi } from './chat-api'
 import { removeMessage, replaceChat, setChatTitle, upsertMessage } from './chat-cache'
 import { chatKeys } from './chat-queries'
+
+// The backend's refusal of free text outside the client's service window
+const WINDOW_CLOSED_ERROR = 'ServiceWindowClosedError'
 
 // Three things arrive in any order: the optimistic message, the POST's 201 and message.created
 // from the stream. upsertMessage replaces by id, so they converge to one message
@@ -39,7 +43,12 @@ export function useAddMessage(chatId: string) {
         upsertMessage(onMutateResult ? removeMessage(data, onMutateResult.tempId) : data, saved),
       )
     },
-    onError: (_error, _input, onMutateResult) => {
+    onError: (error, _input, onMutateResult) => {
+      // The window closed while they wrote: the chat's new expiry turns the composer into its notice.
+      // Not awaited, so the composer gets its text back first
+      if (isApiError(error) && error.code === WINDOW_CLOSED_ERROR) {
+        void queryClient.invalidateQueries({ queryKey: chatKeys.detail(chatId) })
+      }
       if (!onMutateResult) return
       queryClient.setQueryData<InfiniteData<MessagePage>>(queryKey, (data) => removeMessage(data, onMutateResult.tempId))
     },
