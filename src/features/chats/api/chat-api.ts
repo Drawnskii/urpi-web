@@ -1,6 +1,15 @@
 import { http } from '@/shared/api'
 
-import type { AddMessageInput, Chat, ChatPage, MediaLink, Message, MessagePage, RenameChatInput } from '../model/chat'
+import type {
+  AddMessageInput,
+  Chat,
+  ChatPage,
+  MediaLink,
+  Message,
+  MessagePage,
+  RenameChatInput,
+  SendTemplateInput,
+} from '../model/chat'
 
 export const chatApi = {
   // latest_per_client: the inbox, one row per client (its newest chat). client_id: that client's chats
@@ -28,6 +37,11 @@ export const chatApi = {
   // 201: the message is PENDING; the backend's send worker delivers it. 409 ChatClosedError on a closed chat
   addMessage: (chatId: string, input: AddMessageInput) =>
     http<Message>(`/chats/${chatId}/messages`, { method: 'POST', body: input }),
+
+  // 201: an approved template, PENDING like a message; it goes inside the service window or not.
+  // 404 TemplateNotFoundError, 409 TemplateNotApprovedError or ChatClosedError, 422 refused values
+  sendTemplate: (chatId: string, input: SendTemplateInput) =>
+    http<Message>(`/chats/${chatId}/templates`, { method: 'POST', body: input }),
 
   // A signed link to a READY file, valid a few minutes. 409 MediaNotReadyError before READY
   getMedia: (chatId: string, messageId: string) =>

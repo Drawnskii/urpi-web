@@ -110,7 +110,7 @@ export interface MessagePayloads {
     title: string
     description: string | null
   }
-  TEMPLATE: { name: string; language: string; parameters: string[] }
+  TEMPLATE: { name: string; language: string; values: Record<string, string> } // by variable
   UNSUPPORTED: { meta_type: string } // Meta's name for it: order, edit, poll_creation…
 }
 
@@ -146,6 +146,12 @@ export interface RenameChatInput {
 // Mirrors AddMessageIn
 export interface AddMessageInput {
   content: string
+}
+
+// Mirrors SendTemplateIn: one value per variable of the template
+export interface SendTemplateInput {
+  template_id: string
+  values: Record<string, string>
 }
 
 // Mirrors ChatReadOut: the data of chat.read (GET /events). The count as of when it was pushed,

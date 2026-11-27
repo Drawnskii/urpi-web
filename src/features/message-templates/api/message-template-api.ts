@@ -9,4 +9,8 @@ export const messageTemplateApi = {
   // 201 PENDING. 404: no ACTIVE number. 409: name and language taken. 422: invalid draft.
   // 502: Meta refused or failed, with its reason as the message
   create: (input: CreateMessageTemplateInput) => http<MessageTemplate>('/templates', { method: 'POST', body: input }),
+
+  // Checks them against Meta, for changes it never sent, and returns the list. 404: no ACTIVE
+  // number. 502: Meta refused or failed
+  sync: () => http<MessageTemplate[]>('/templates/sync', { method: 'POST' }),
 }

@@ -16,11 +16,13 @@ import {
   templateVariables,
   toCreateInput,
   toTemplateName,
+  STARTER_TEMPLATES,
   TEMPLATE_BODY_MAX_LENGTH,
   type CreateMessageTemplateInput,
   type MessageTemplateCategory,
   type TemplateDraftErrors,
 } from '../model/message-template'
+import { VariableFields } from './variable-fields'
 
 const CATEGORIES: { value: MessageTemplateCategory; label: string }[] = [
   { value: 'UTILITY', label: 'Utility: about a booking or order' },
@@ -78,8 +80,25 @@ export function TemplateForm() {
     })
   }
 
+  // A starter fills the whole form; the tenant edits it before sending
+  function startFrom(draft: CreateMessageTemplateInput) {
+    setValues(draft)
+    setErrors({})
+    setFormError(undefined)
+    setHasNoNumber(false)
+  }
+
   return (
     <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-body-sm text-muted-foreground">Start from:</span>
+        {STARTER_TEMPLATES.map(({ label, draft }) => (
+          <Button key={draft.name} type="button" variant="outline" size="sm" onClick={() => startFrom(draft)}>
+            {label}
+          </Button>
+        ))}
+      </div>
+
       <div className="flex flex-col gap-1">
         <Label htmlFor="template-name">Name</Label>
         <Input
@@ -161,22 +180,14 @@ export function TemplateForm() {
       {variables.length > 0 && (
         <fieldset className="flex flex-col gap-2">
           <legend>Examples for Meta's review</legend>
-          {variables.map((variable) => {
-            const error = errors.examples?.[variable]
-            return (
-              <div key={variable} className="flex flex-col gap-1">
-                <Label htmlFor={`template-example-${variable}`}>{variable}</Label>
-                <Input
-                  id={`template-example-${variable}`}
-                  value={values.examples[variable] ?? ''}
-                  onChange={(event) => handleExampleChange(variable, event.target.value)}
-                  aria-invalid={Boolean(error)}
-                  aria-describedby={error ? `template-example-${variable}-error` : undefined}
-                />
-                {error && <p id={`template-example-${variable}-error`} role="alert" className="text-body-sm text-destructive">{error}</p>}
-              </div>
-            )
-          })}
+          <VariableFields
+            idPrefix="template-example"
+            variables={variables}
+            values={values.examples}
+            errors={errors.examples}
+            onChange={handleExampleChange}
+          />
+
         </fieldset>
       )}
 

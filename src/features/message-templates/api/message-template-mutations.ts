@@ -18,3 +18,12 @@ export function useCreateMessageTemplate() {
     },
   })
 }
+
+// The response is the whole list as Meta has it now: it replaces the cached one
+export function useSyncMessageTemplates() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: messageTemplateApi.sync,
+    onSuccess: (templates) => queryClient.setQueryData(messageTemplateKeys.list(), templates),
+  })
+}

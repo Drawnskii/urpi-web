@@ -3,7 +3,15 @@ import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-
 import { useCurrentTenant } from '@/features/tenants'
 import { isApiError } from '@/shared/api'
 
-import type { AddMessageInput, Chat, ChatPage, Message, MessagePage, RenameChatInput } from '../model/chat'
+import type {
+  AddMessageInput,
+  Chat,
+  ChatPage,
+  Message,
+  MessagePage,
+  RenameChatInput,
+  SendTemplateInput,
+} from '../model/chat'
 import { chatApi } from './chat-api'
 import { removeMessage, replaceChat, setChatTitle, upsertMessage } from './chat-cache'
 import { chatKeys } from './chat-queries'
@@ -51,6 +59,19 @@ export function useAddMessage(chatId: string) {
       }
       if (!onMutateResult) return
       queryClient.setQueryData<InfiniteData<MessagePage>>(queryKey, (data) => removeMessage(data, onMutateResult.tempId))
+    },
+  })
+}
+
+// Not optimistic: only the server knows the template is still approved and renders its text. The
+// saved message joins the list; message.created from the stream replaces it by id
+export function useSendTemplate(chatId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (input: SendTemplateInput) => chatApi.sendTemplate(chatId, input),
+    onSuccess: (saved) => {
+      queryClient.setQueryData<InfiniteData<MessagePage>>(chatKeys.messages(chatId), (data) => upsertMessage(data, saved))
     },
   })
 }

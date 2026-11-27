@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
-import { ArrowUpIcon, ChevronDownIcon, ClockIcon, FileTextIcon, Undo2Icon } from 'lucide-react'
-import { useState, type ChangeEvent, type ComponentProps, type KeyboardEvent, type ReactNode, type SubmitEvent } from 'react'
+import { ArrowUpIcon, ChevronDownIcon, ClockIcon, Undo2Icon } from 'lucide-react'
+import { useState, type ChangeEvent, type KeyboardEvent, type ReactNode, type SubmitEvent } from 'react'
 
 import { Button } from '@/shared/components/ui/button'
 import { Textarea } from '@/shared/components/ui/textarea'
@@ -13,6 +13,7 @@ import { useServiceWindow } from '../hooks/use-service-window'
 import { useTypingIndicator } from '../hooks/use-typing-indicator'
 import type { Chat } from '../model/chat'
 import { ClientChatsPicker } from './client-chats-picker'
+import { SendTemplateDialog } from './send-template-dialog'
 
 // One card for the text and its actions; it shows the focus ring the textarea gives up
 const CARD_CLASS =
@@ -92,9 +93,9 @@ function OpenChatComposer({ chat, minutesLeft, content, onContentChange }: OpenC
           className="max-h-50 min-h-10 resize-none rounded-none border-0 bg-transparent px-2 text-body-sm shadow-none focus-visible:ring-0 md:text-body-sm dark:bg-transparent"
         />
         <div className="flex items-center gap-2">
-          <TemplateButton label="Template" variant="ghost" size="sm" className="shrink-0">
+          <SendTemplateDialog chatId={chatId} label="Template" variant="ghost" size="sm" className="shrink-0">
             <ChevronDownIcon data-icon="inline-end" aria-hidden="true" className="hidden sm:block" />
-          </TemplateButton>
+          </SendTemplateDialog>
           <ClientChatsPicker chat={chat} />
           <Button
             type="submit"
@@ -113,22 +114,6 @@ function OpenChatComposer({ chat, minutesLeft, content, onContentChange }: OpenC
         </p>
       )}
     </form>
-  )
-}
-
-interface TemplateButtonProps extends ComponentProps<typeof Button> {
-  label: string
-}
-
-// Where sending a template will start (outside the service window, only a template reaches the client).
-// The icon alone on phones: the row's room goes to the chats picker
-function TemplateButton({ label, children, ...props }: TemplateButtonProps) {
-  return (
-    <Button type="button" disabled title="Sending templates from a chat is coming soon" aria-label={label} {...props}>
-      <FileTextIcon data-icon="inline-start" aria-hidden="true" />
-      <span className="hidden sm:inline">{label}</span>
-      {children}
-    </Button>
   )
 }
 
@@ -176,7 +161,7 @@ function ClosedChatNotice({ chat }: MessageComposerProps) {
 
 // Open, but too long since the client wrote
 function ClosedWindowNotice({ chat }: MessageComposerProps) {
-  const sendTemplate = <TemplateButton label="Send template" className="ml-auto shrink-0 max-sm:px-2" />
+  const sendTemplate = <SendTemplateDialog chatId={chat.id} label="Send template" className="ml-auto shrink-0 max-sm:px-2" />
 
   return (
     <ReadOnlyComposer chat={chat} action={sendTemplate}>
