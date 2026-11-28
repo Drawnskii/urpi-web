@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient, type InfiniteData } from '@tanstack/react-query'
 
 import { useCurrentTenant } from '@/features/tenants'
+import { whatsAppConnectionQueries } from '@/features/whatsapp-connection'
 import { isApiError } from '@/shared/api'
 
 import type {
@@ -18,6 +19,8 @@ import { chatKeys } from './chat-queries'
 
 // The backend's refusal of free text outside the client's service window
 const WINDOW_CLOSED_ERROR = 'ServiceWindowClosedError'
+// Its refusal of a template while the business can't send any
+const TEMPLATES_DISABLED_ERROR = 'TemplatesDisabledError'
 
 // Three things arrive in any order: the optimistic message, the POST's 201 and message.created
 // from the stream. upsertMessage replaces by id, so they converge to one message
@@ -72,6 +75,12 @@ export function useSendTemplate(chatId: string) {
     mutationFn: (input: SendTemplateInput) => chatApi.sendTemplate(chatId, input),
     onSuccess: (saved) => {
       queryClient.setQueryData<InfiniteData<MessagePage>>(chatKeys.messages(chatId), (data) => upsertMessage(data, saved))
+    },
+    // Turned off since the picker read the number: read it again, and the picker says why
+    onError: (error) => {
+      if (isApiError(error) && error.code === TEMPLATES_DISABLED_ERROR) {
+        return queryClient.invalidateQueries({ queryKey: whatsAppConnectionQueries.detail().queryKey })
+      }
     },
   })
 }

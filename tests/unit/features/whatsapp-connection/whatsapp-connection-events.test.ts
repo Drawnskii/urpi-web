@@ -7,7 +7,16 @@ import type { WhatsAppConnection } from '@/features/whatsapp-connection/model/wh
 const DETAIL_KEY = ['whatsapp-connection', 'current']
 
 function connection(status: WhatsAppConnection['status'] = 'ACTIVE'): WhatsAppConnection {
-  return { account_id: 'a1', waba_id: '102', phone_number_id: '106', phone_number: '+15556635449', status }
+  return {
+    account_id: 'a1',
+    waba_id: '102',
+    phone_number_id: '106',
+    phone_number: '+15556635449',
+    status,
+    payment_method_ready: true,
+    payment_method_checked_at: '2026-11-27T12:00:00Z',
+    templates_enabled: true,
+  }
 }
 
 describe('whatsAppConnectionLiveEvents', () => {

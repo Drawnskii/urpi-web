@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router'
 
+import { PaymentMethodCard } from '@/features/whatsapp-connection'
 import { Button } from '@/shared/components/ui/button'
 
 export function DashboardPage() {
@@ -9,6 +10,7 @@ export function DashboardPage() {
         <h1 className="text-display">Welcome to Urpi</h1>
         <p className="text-body-lg text-muted-foreground">Your clients' WhatsApp conversations, in one place.</p>
       </header>
+      <PaymentMethodCard />
       <div className="grid gap-10 md:grid-cols-3">
         <section className="flex flex-col items-start gap-3">
           <h2 className="text-h3">Chats</h2>

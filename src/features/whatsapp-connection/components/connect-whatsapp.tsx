@@ -9,9 +9,6 @@ import { useEmbeddedSignup, type SignupInterruption } from '../hooks/use-embedde
 import { connectErrorText } from '../model/connect-error'
 import { DisconnectWhatsApp } from './disconnect-whatsapp'
 
-// Payment methods have no API: the business adds one in WhatsApp Manager (roadmap T8)
-const WHATSAPP_MANAGER_URL = 'https://business.facebook.com/wa/manage/home/'
-
 function interruptionText(interruption: Exclude<SignupInterruption, { kind: 'failed' }>) {
   if (interruption.kind === 'incomplete') {
     return 'Signup finished without a phone number. Start again and pick or add one.'
@@ -83,16 +80,7 @@ export function ConnectWhatsApp({ canDisconnect }: ConnectWhatsAppProps) {
       </Button>
 
       {isConnected ? (
-        <>
-          <p>Connected: {connection.phone_number}</p>
-          <p className="text-body-sm text-muted-foreground">
-            To send templates or write after 24 hours, add a payment method in{' '}
-            <a href={WHATSAPP_MANAGER_URL} target="_blank" rel="noreferrer">
-              WhatsApp Manager
-            </a>
-            .
-          </p>
-        </>
+        <p>Connected: {connection.phone_number}</p>
       ) : (
         <>
           {!signup.isReady && !signup.sdkError && <p className="text-body-sm text-muted-foreground">Loading Meta's signup…</p>}

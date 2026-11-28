@@ -20,6 +20,9 @@ export const whatsAppConnectionApi = {
   // Finishes a connection that stayed CONNECTING (no new popup needed). 404: nothing to finish
   finish: () => http<WhatsAppConnection>('/whatsapp/connections/retry', { method: 'POST' }),
 
+  // Asks Meta about the payment method now. 404: no connected number. 502: Meta didn't answer
+  checkPaymentMethod: () => http<WhatsAppConnection>('/whatsapp/connections/payment-method/check', { method: 'POST' }),
+
   // 204: disconnected, token and PIN wiped (even if Meta failed to unsubscribe the app). 404: no number
   disconnect: () => http<void>('/whatsapp/connections', { method: 'DELETE' }),
 }

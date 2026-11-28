@@ -1,5 +1,5 @@
 import { isOwner, useCurrentTenant } from '@/features/tenants'
-import { ConnectWhatsApp } from '@/features/whatsapp-connection'
+import { ConnectWhatsApp, PaymentMethodCard } from '@/features/whatsapp-connection'
 
 export function WhatsAppPage() {
   const tenant = useCurrentTenant()
@@ -9,6 +9,7 @@ export function WhatsAppPage() {
       <h1>WhatsApp number</h1>
       <p className="text-muted-foreground">Connect your business's WhatsApp number through Meta.</p>
       <ConnectWhatsApp canDisconnect={isOwner(tenant)} />
+      <PaymentMethodCard />
     </div>
   )
 }

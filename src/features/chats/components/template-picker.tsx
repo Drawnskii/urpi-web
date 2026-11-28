@@ -1,8 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
+import { usePrefetchQuery, useQuery } from '@tanstack/react-query'
 import { Link } from '@tanstack/react-router'
 import { useState } from 'react'
 
 import { CATEGORY_LABELS, messageTemplateQueries, pickerTemplates, STATUS_INFO } from '@/features/message-templates'
+import { PaymentMethodCard, whatsAppConnectionQueries } from '@/features/whatsapp-connection'
 import { Badge } from '@/shared/components/ui/badge'
 import { Button } from '@/shared/components/ui/button'
 import { Input } from '@/shared/components/ui/input'
@@ -14,8 +15,39 @@ interface TemplatePickerProps {
   onSent: () => void
 }
 
+// While the business can't send templates, why instead of them. A number that can't be read leaves
+// them: the server still refuses what mustn't go
+export function TemplatePicker(props: TemplatePickerProps) {
+  const connection = useQuery(whatsAppConnectionQueries.detail())
+  usePrefetchQuery(messageTemplateQueries.list()) // alongside the number, not after it
+
+  if (connection.isPending) return <LoadingTemplates />
+
+  const number = connection.data?.status === 'ACTIVE' ? connection.data : null
+  const isOff = number !== null && !number.templates_enabled
+  // Staff turned them on without a payment method: the templates are what's wanted here, not the card
+  const isOnWithoutCard = number !== null && number.templates_enabled && !number.payment_method_ready
+
+  return (
+    <div className="flex min-w-0 flex-col gap-2">
+      {/* Stays in place when the templates come back, so it can confirm what its check found */}
+      {!isOnWithoutCard && <PaymentMethodCard />}
+      {!isOff && <TemplateChoice {...props} />}
+      {isOff && number.payment_method_ready && (
+        <p className="text-body-sm text-muted-foreground">
+          Sending templates is turned off for your business. Contact Urpi to turn it on.
+        </p>
+      )}
+    </div>
+  )
+}
+
+function LoadingTemplates() {
+  return <p className="text-body-sm text-muted-foreground">Loading templates…</p>
+}
+
 // Choose a template (approved ones first; the others show why they can't go), then fill it
-export function TemplatePicker({ chatId, onSent }: TemplatePickerProps) {
+function TemplateChoice({ chatId, onSent }: TemplatePickerProps) {
   const { data: templates, error } = useQuery(messageTemplateQueries.list())
   const [search, setSearch] = useState('')
   const [chosenId, setChosenId] = useState<string>()
@@ -32,7 +64,7 @@ export function TemplatePicker({ chatId, onSent }: TemplatePickerProps) {
       </p>
     )
   }
-  if (!templates) return <p className="text-body-sm text-muted-foreground">Loading templates…</p>
+  if (!templates) return <LoadingTemplates />
   if (templates.length === 0) {
     return (
       <p className="text-body-sm text-muted-foreground">

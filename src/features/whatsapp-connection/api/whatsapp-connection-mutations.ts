@@ -6,16 +6,18 @@ import type { WhatsAppConnection } from '../model/whatsapp-connection'
 import { whatsAppConnectionApi } from './whatsapp-connection-api'
 import { whatsAppConnectionKeys } from './whatsapp-connection-queries'
 
-// Named after the backend's use cases. Connect and finish return the connection: it becomes the cached one
+// Named after the backend's use cases. Connect, finish and the payment method check return the
+// connection: it becomes the cached one
 
 function useSaveConnection() {
   const queryClient = useQueryClient()
   return {
     onSuccess: (connection: WhatsAppConnection) =>
       queryClient.setQueryData(whatsAppConnectionKeys.detail(), connection),
-    // 409: the tenant is already connected (another tab, another member): show what's there
+    // 409: already connected. 404: no number to finish or check. Another tab, another member or Meta
+    // moved on: show what's there
     onError: (error: Error) => {
-      if (isApiError(error) && error.isConflict) {
+      if (isApiError(error) && (error.isConflict || error.isNotFound)) {
         return queryClient.invalidateQueries({ queryKey: whatsAppConnectionKeys.detail() })
       }
     },
@@ -28,6 +30,10 @@ export function useConnectWhatsAppAccount() {
 
 export function useFinishWhatsAppConnection() {
   return useMutation({ mutationFn: whatsAppConnectionApi.finish, ...useSaveConnection() })
+}
+
+export function useCheckPaymentMethod() {
+  return useMutation({ mutationFn: whatsAppConnectionApi.checkPaymentMethod, ...useSaveConnection() })
 }
 
 // The tenant has no live number afterwards: null, as GET's 404 would say, without a refetch.
