@@ -10,6 +10,7 @@ function base(id: string) {
     sender_tenant_member_id: null,
     status: null,
     failure_reason: null,
+    failure_code: null,
     created_at: '2026-11-21T10:00:00Z',
   }
 }

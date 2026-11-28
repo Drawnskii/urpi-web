@@ -13,6 +13,7 @@ function message(id: string, day: number, hours: number, sender_type: SenderType
     payload: {},
     status: null,
     failure_reason: null,
+    failure_code: null,
     created_at: new Date(2026, 9, day, hours, 0).toISOString(),
   }
 }

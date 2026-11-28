@@ -47,6 +47,22 @@ export type SenderType = 'CLIENT' | 'AGENT' | 'TENANT_MEMBER'
 
 export type MessageStatus = 'PENDING' | 'SENDING' | 'SENT' | 'DELIVERED' | 'READ' | 'FAILED'
 
+// Why a message of ours failed (backend: SendFailure)
+export type SendFailure =
+  | 'OUTSIDE_WINDOW'
+  | 'PAYMENT_METHOD'
+  | 'UNDELIVERABLE'
+  | 'MARKETING_STOPPED'
+  | 'MARKETING_LIMITED'
+  | 'SPAM_LIMITED'
+  | 'TEMPLATE'
+  | 'NOT_CONNECTED'
+  | 'NO_RECIPIENT'
+  | 'RATE_LIMITED'
+  | 'UNAVAILABLE'
+  | 'OUTCOME_UNKNOWN'
+  | 'REJECTED'
+
 // What a message holds. content is always readable, so a type this list doesn't name yet (a newer
 // backend) still shows: the body falls back to content
 type MessageType =
@@ -120,7 +136,8 @@ interface MessageBase {
   sender_tenant_member_id: string | null  // TENANT_MEMBER: who wrote it; null on the others, and once the member is deleted
   content: string                // always readable: the text, or a placeholder ("📷 Photo: caption")
   status: MessageStatus | null   // null on client messages
-  failure_reason: string | null  // FAILED only
+  failure_reason: SendFailure | null  // FAILED only
+  failure_code: number | null    // FAILED only: Meta's error code, when it gave one
   created_at: string             // ISO 8601
 }
 

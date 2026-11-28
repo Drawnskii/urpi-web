@@ -13,6 +13,7 @@ import { authorFullName, messageAuthor, sameAuthor } from '../model/message-auth
 import { groupMessagesByDay, groupMessagesBySide } from '../model/message-groups'
 import { isReaction, reactionsByTarget } from '../model/message-reactions'
 import { MessageBubble } from './message-bubble'
+import { MessageFailure } from './message-failure'
 import { RespondingBubble } from './responding-bubble'
 
 interface MessageListProps {
@@ -83,6 +84,7 @@ export function MessageList({ chatId, children }: MessageListProps) {
                           author={author}
                           reaction={reactions.get(message.id)}
                           quoted={quoted}
+                          failure={message.failure_reason && <MessageFailure chatId={chatId} message={message} />}
                         />
                       )
                     })}

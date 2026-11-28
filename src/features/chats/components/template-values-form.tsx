@@ -72,6 +72,7 @@ export function TemplateValuesForm({ chatId, template, onBack, onSent }: Templat
             payload: {},
             status: null,
             failure_reason: null,
+            failure_code: null,
             created_at: previewedAt,
           }}
         />

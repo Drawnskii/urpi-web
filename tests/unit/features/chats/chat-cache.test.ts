@@ -22,6 +22,7 @@ function message(id: string, createdAt: string, overrides: Partial<MessageOf<'TE
     payload: {},
     status: null,
     failure_reason: null,
+    failure_code: null,
     created_at: createdAt,
     ...overrides,
   }

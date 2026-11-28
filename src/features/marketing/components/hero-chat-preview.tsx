@@ -15,6 +15,7 @@ const HERO_MESSAGES: Message[] = [
     payload: {},
     status: null,
     failure_reason: null,
+    failure_code: null,
     created_at: '2026-11-22T17:14:00Z',
   },
   {
@@ -26,6 +27,7 @@ const HERO_MESSAGES: Message[] = [
     payload: {},
     status: 'READ',
     failure_reason: null,
+    failure_code: null,
     created_at: '2026-11-22T17:14:03Z',
   },
   {
@@ -37,6 +39,7 @@ const HERO_MESSAGES: Message[] = [
     payload: {},
     status: null,
     failure_reason: null,
+    failure_code: null,
     created_at: '2026-11-22T17:14:10Z',
   },
   {
@@ -48,6 +51,7 @@ const HERO_MESSAGES: Message[] = [
     payload: {},
     status: null,
     failure_reason: null,
+    failure_code: null,
     created_at: '2026-11-22T17:14:13Z',
   },
   {
@@ -59,6 +63,7 @@ const HERO_MESSAGES: Message[] = [
     payload: {},
     status: 'READ',
     failure_reason: null,
+    failure_code: null,
     created_at: '2026-11-22T17:14:19Z',
   },
 ]

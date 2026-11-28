@@ -43,6 +43,7 @@
   --sidebar-border: oklch(0.8800 0.0150 215);
   --sidebar-ring: oklch(0.4200 0.0450 215);
   --read: oklch(0.52 0.22 250);
+  --failed: oklch(0.50 0.19 25); /* one for both themes: the sent bubble it sits on is light in both */
   --font-sans: 'Work Sans Variable', ui-sans-serif, sans-serif, system-ui;
   --font-serif: 'Roboto Serif Variable', ui-serif, serif;
   --font-mono: 'Fira Mono', ui-monospace, monospace;
@@ -166,6 +167,7 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-read: var(--read);
+  --color-failed: var(--failed);
 
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);

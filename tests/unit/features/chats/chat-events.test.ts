@@ -13,6 +13,7 @@ const message = {
   payload: {},
   status: null,
   failure_reason: null,
+  failure_code: null,
   created_at: '2026-10-21T10:01:00Z',
 }
 

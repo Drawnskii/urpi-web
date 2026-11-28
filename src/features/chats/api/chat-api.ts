@@ -43,6 +43,11 @@ export const chatApi = {
   sendTemplate: (chatId: string, input: SendTemplateInput) =>
     http<Message>(`/chats/${chatId}/templates`, { method: 'POST', body: input }),
 
+  // A failed text goes back to PENDING. 409 MessageNotRetryableError (it may have been sent, or it
+  // isn't failed any more), ServiceWindowClosedError or ChatClosedError
+  retryMessage: (chatId: string, messageId: string) =>
+    http<Message>(`/chats/${chatId}/messages/${messageId}/retry`, { method: 'POST' }),
+
   // A signed link to a READY file, valid a few minutes. 409 MediaNotReadyError before READY
   getMedia: (chatId: string, messageId: string) =>
     http<MediaLink>(`/chats/${chatId}/messages/${messageId}/media`),

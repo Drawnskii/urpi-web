@@ -1,4 +1,5 @@
 import { CheckCheckIcon, CheckIcon, CircleAlertIcon, ClockIcon, type LucideIcon } from 'lucide-react'
+import type { ReactNode } from 'react'
 
 import { formatDateTime, formatTime } from '@/shared/lib'
 import { cn } from '@/shared/lib/utils'
@@ -14,7 +15,7 @@ const STATUS_ICONS: Record<MessageStatus, { icon: LucideIcon; label: string; cla
   SENT: { icon: CheckIcon, label: 'Sent' },
   DELIVERED: { icon: CheckCheckIcon, label: 'Delivered' },
   READ: { icon: CheckCheckIcon, label: 'Read', className: 'text-read' },
-  FAILED: { icon: CircleAlertIcon, label: 'Failed', className: 'text-destructive' },
+  FAILED: { icon: CircleAlertIcon, label: 'Failed', className: 'text-failed' },
 }
 
 interface MessageBubbleProps {
@@ -29,10 +30,14 @@ interface MessageBubbleProps {
   reaction?: string
   // The message this one replies to: undefined when it's not a reply, null when Urpi doesn't have it
   quoted?: Message | null
+  // A failed message's icon, which says why and what to do. Passed in: it opens the template
+  // dialog, whose preview is this bubble
+  failure?: ReactNode
 }
 
 // One message: client messages on the left, the agent's and members' on the right
-export function MessageBubble({ chatId, message, isContinued = false, author = null, reaction, quoted }: MessageBubbleProps) {
+export function MessageBubble(props: MessageBubbleProps) {
+  const { chatId, message, isContinued = false, author = null, reaction, quoted, failure } = props
   const isClient = message.sender_type === 'CLIENT'
   // Client messages have no status (they're incoming)
   const status = message.status ? STATUS_ICONS[message.status] : null
@@ -67,19 +72,15 @@ export function MessageBubble({ chatId, message, isContinued = false, author = n
           <time dateTime={message.created_at} title={formatDateTime(message.created_at)}>
             {formatTime(message.created_at)}
           </time>
-          {status && (
-            <span title={status.label} className={cn('flex', status.className)}>
-              <status.icon aria-hidden="true" className="size-4" />
-              <span className="sr-only">{status.label}</span>
-            </span>
-          )}
+          {failure ||
+            (status && (
+              <span title={status.label} className={cn('flex', status.className)}>
+                <status.icon aria-hidden="true" className="size-4" />
+                <span className="sr-only">{status.label}</span>
+              </span>
+            ))}
         </div>
       </div>
-      {message.failure_reason && (
-        <p role="alert" className="text-body-sm text-destructive">
-          {message.failure_reason}
-        </p>
-      )}
       {author && <span className="px-1 text-caption text-muted-foreground">{author}</span>}
     </li>
   )

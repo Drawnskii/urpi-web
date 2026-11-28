@@ -43,6 +43,7 @@ export function useAddMessage(chatId: string) {
         payload: {},
         status: 'PENDING',
         failure_reason: null,
+        failure_code: null,
         created_at: new Date().toISOString(),
       }
       queryClient.setQueryData<InfiniteData<MessagePage>>(queryKey, (data) => upsertMessage(data, optimistic))
@@ -81,6 +82,28 @@ export function useSendTemplate(chatId: string) {
       if (isApiError(error) && error.code === TEMPLATES_DISABLED_ERROR) {
         return queryClient.invalidateQueries({ queryKey: whatsAppConnectionQueries.detail().queryKey })
       }
+    },
+  })
+}
+
+// Not optimistic: only the server knows it may still be sent. The queued message replaces the failed
+// one, and the stream follows it from there
+export function useRetryMessage(chatId: string) {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (messageId: string) => chatApi.retryMessage(chatId, messageId),
+    onSuccess: (queued) => {
+      queryClient.setQueryData<InfiniteData<MessagePage>>(chatKeys.messages(chatId), (data) => upsertMessage(data, queued))
+    },
+    // The chat or the message changed since it was shown (closed, window over, already queued):
+    // read both again, so the bubble offers what can still be done
+    onError: (error) => {
+      if (!isApiError(error) || !error.isConflict) return
+      return Promise.all([
+        queryClient.invalidateQueries({ queryKey: chatKeys.detail(chatId) }),
+        queryClient.invalidateQueries({ queryKey: chatKeys.messages(chatId) }),
+      ])
     },
   })
 }

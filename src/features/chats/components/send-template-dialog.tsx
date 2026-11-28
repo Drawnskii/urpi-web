@@ -1,5 +1,5 @@
 import { FileTextIcon } from 'lucide-react'
-import { useState, type ComponentProps } from 'react'
+import { useState, type ComponentProps, type ReactNode } from 'react'
 
 import { Button } from '@/shared/components/ui/button'
 import {
@@ -20,12 +20,12 @@ interface SendTemplateDialogProps extends ComponentProps<typeof Button> {
 
 // The button that sends a template (outside the service window, only a template reaches the
 // client) and its dialog. The button is the icon alone on phones: the row's room goes to the chats
-// picker. The dialog's content exists only while it's open, so each opening starts afresh
+// picker
 export function SendTemplateDialog({ chatId, label, children, ...props }: SendTemplateDialogProps) {
   const [isOpen, setIsOpen] = useState(false)
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <TemplateDialog chatId={chatId} open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button type="button" aria-label={label} {...props}>
           <FileTextIcon data-icon="inline-start" aria-hidden="true" />
@@ -33,7 +33,25 @@ export function SendTemplateDialog({ chatId, label, children, ...props }: SendTe
           {children}
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[85dvh] grid-cols-1 overflow-y-auto sm:max-w-md">
+    </TemplateDialog>
+  )
+}
+
+interface TemplateDialogProps {
+  chatId: string
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onCloseAutoFocus?: (event: Event) => void // opened without a DialogTrigger: where focus goes back
+  children?: ReactNode // the DialogTrigger, if it has one
+}
+
+// The dialog alone, for whatever opens it. Its content exists only while it's open, so each opening
+// starts afresh
+export function TemplateDialog({ chatId, onCloseAutoFocus, children, ...dialog }: TemplateDialogProps) {
+  return (
+    <Dialog {...dialog}>
+      {children}
+      <DialogContent className="max-h-[85dvh] grid-cols-1 overflow-y-auto sm:max-w-md" onCloseAutoFocus={onCloseAutoFocus}>
         <DialogHeader>
           <DialogTitle>Send a template</DialogTitle>
           <DialogDescription>
@@ -41,7 +59,7 @@ export function SendTemplateDialog({ chatId, label, children, ...props }: SendTe
             reopen the 24-hour window: the client's answer does.
           </DialogDescription>
         </DialogHeader>
-        <TemplatePicker chatId={chatId} onSent={() => setIsOpen(false)} />
+        <TemplatePicker chatId={chatId} onSent={() => dialog.onOpenChange(false)} />
       </DialogContent>
     </Dialog>
   )
