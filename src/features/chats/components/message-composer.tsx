@@ -96,7 +96,7 @@ function OpenChatComposer({ chat, minutesLeft, content, onContentChange }: OpenC
           <SendTemplateDialog chatId={chatId} label="Template" variant="ghost" size="sm" className="shrink-0">
             <ChevronDownIcon data-icon="inline-end" aria-hidden="true" className="hidden sm:block" />
           </SendTemplateDialog>
-          <ClientChatsPicker chat={chat} />
+          <ClientChatsPicker chat={chat} size="sm" />
           <Button
             type="submit"
             size="icon"
@@ -119,18 +119,19 @@ function OpenChatComposer({ chat, minutesLeft, content, onContentChange }: OpenC
 
 interface ReadOnlyComposerProps extends MessageComposerProps {
   action: ReactNode
+  pickerSize?: 'sm' // beside a small action
   children: ReactNode // why there's no text box
 }
 
 // The composer's card without a text box: why, then the chats picker and what can be done instead.
 // On phones the action is its icon alone, and the picker gets the row's room
-function ReadOnlyComposer({ chat, action, children }: ReadOnlyComposerProps) {
+function ReadOnlyComposer({ chat, action, pickerSize, children }: ReadOnlyComposerProps) {
   return (
     <div className="p-4">
       <div className={CARD_CLASS}>
         <p className="px-2 py-1 text-body-sm text-muted-foreground">{children}</p>
         <div className="flex items-center gap-2">
-          <ClientChatsPicker chat={chat} />
+          <ClientChatsPicker chat={chat} size={pickerSize} />
           {action}
         </div>
       </div>
@@ -152,7 +153,7 @@ function ClosedChatNotice({ chat }: MessageComposerProps) {
   )
 
   return (
-    <ReadOnlyComposer chat={chat} action={goToCurrent}>
+    <ReadOnlyComposer chat={chat} action={goToCurrent} pickerSize="sm">
       Closed {chat.closed_at && <time dateTime={chat.closed_at}>{formatDateTime(chat.closed_at)}</time>}. Nobody can
       reply here: if the client writes again, a new chat opens.
     </ReadOnlyComposer>

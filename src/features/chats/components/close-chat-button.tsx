@@ -19,11 +19,12 @@ import type { Chat } from '../model/chat'
 
 interface CloseChatButtonProps {
   chat: Chat
+  size: 'icon' | 'icon-sm'
 }
 
 // The icon button next to the client's chats picker. Closing can't be undone, so it always asks
 // first and says what happens; the dialog stays open until the server confirms, or shows why not
-export function CloseChatButton({ chat }: CloseChatButtonProps) {
+export function CloseChatButton({ chat, size }: CloseChatButtonProps) {
   const [isOpen, setIsOpen] = useState(false)
   const closeChat = useCloseChat(chat.id)
   const isClosed = chat.status === 'CLOSED'
@@ -46,7 +47,7 @@ export function CloseChatButton({ chat }: CloseChatButtonProps) {
         <Button
           type="button"
           variant="outline"
-          size="icon"
+          size={size}
           className="shrink-0"
           disabled={isClosed}
           aria-label="Close chat"
